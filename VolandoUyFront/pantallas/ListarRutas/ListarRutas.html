@@ -1,0 +1,67 @@
+<div id="root-listar-rutas">
+
+</div>
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module">
+    import ControladorVuelos from './controladores/vuelos.js'
+    import {navigate} from "./utils/index.js"
+    try {
+        const filtros = JSON.parse(localStorage.getItem("filtros"))
+        const listarRutasDeVuelo = async ()=>{
+            let rutas = await ControladorVuelos.listarRutasConfirmadas();
+            console.log("hola"+rutas)
+            if(filtros.busqueda){
+                let busqueda = filtros.busqueda;
+                rutas = rutas.filter(r => r.nombre.toLowerCase().includes(busqueda.toLowerCase()));
+            }
+            if(filtros.aerolinea){
+                let aeroFiltro = filtros.aerolinea;
+                rutas=rutas.filter(ruta => ruta.aerolinea === aeroFiltro);
+            }                                             
+            //if(filtros.estado){
+            //    let estadoFiltro = filtros.estado;
+            //    rutas=rutas.filter(ruta => ruta.estado === estadoFiltro);
+            //}
+            if(filtros.categorias?.length>0){
+                let categoriasFiltro = filtros.categorias;
+                categoriasFiltro.forEach((c,i)=>{rutas=rutas.filter(ruta => ruta.categorias.includes(c));});
+            }
+            
+            $('#root-listar-rutas').html(rutas.map((r,i) => `<info-card id='card-${i}' data='${JSON.stringify({image:`./assets/imagenes-precargadas/${r.imagen}`,title:r.nombre,content:r.descripcionCorta})}'>
+                                                                    <div slot="subtitle" id="ciudades">${r.origen.nombre}-->${r.destino.nombre}
+                                                                    </div>
+                                                                    <slot slot="additionalInfo" class="row-categorias">
+                                                                        ${r.categorias.map(r => `<span>${r}</span>`).join('')}
+                                                                    </slot>
+                                                                    
+                                                                </info-card>`).join(''));
+            rutas.forEach((r,i) =>{
+                $(`#card-${i}`).click(()=>{
+                    navigate("/consultaRuta",{ruta:r.nombre})
+                })
+            });
+        }
+        listarRutasDeVuelo();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+<style>
+    
+ #root-listar-rutas{
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+ }
+ .row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-categorias span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+</style>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VolandoUy</title>
+    <script src="utils/jquery-3.7.1.min.js"></script>
+    <link rel="icon" href="/assets/logo/logo.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <nav-bar style="grid-area:header; height: 90px;"></nav-bar>
+    <sidebar-component id="side-bar" style="grid-area: sidebar; height: calc(100vh - 90px);"></sidebar-component>
+    <div style="grid-area: content; height: calc(100vh - 90px);">
+        <div style="height: 100%;" id="app"></div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+    <script type="module" src="./componentes/base/nav-bar/nav-bar.js"></script>
+    <script type="module" src="./componentes/base/side-bar/side-bar.js"></script>
+    <script type="module" src="./componentes/base/resource-list/resource-list.js"></script>
+    <script type="module" src="./componentes/base/error-popup/error-popup.js"></script>
+    <script type="module" src="./componentes/base/success-popup/success-popup.js"></script>
+</body>
+</html>

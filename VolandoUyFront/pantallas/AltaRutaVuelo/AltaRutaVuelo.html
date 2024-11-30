@@ -1,0 +1,309 @@
+<div id="root-alta-ruta-vuelo">
+    <!-- <h1>Registro de Ruta de Vuelo ✈️</h1> -->
+    <form onsubmit="event.preventDefault()">
+        <!-- Nombre único -->
+        <div>
+            <label for="nombre">Nombre (único):</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+
+        <!-- Descripción corta -->
+        <div>
+            <label for="descripcion_corta">Descripción corta:</label>
+            <input type="text" id="descripcion_corta" name="descripcion_corta" maxlength="100" required>
+        </div>
+
+        <!-- Descripción (full width) -->
+        <div class="full-width">
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+        </div>
+
+        <!-- Hora -->
+        <div>
+            <label for="hora">Hora:</label>
+            <input type="time" id="hora" name="hora" required>
+        </div>
+
+        <!-- Costo turista -->
+        <div>
+            <label for="costo_turista">Costo clase turista:</label>
+            <input type="number" id="costo_turista" name="costo_turista" step="0.01" min="0" required>
+        </div>
+
+        <!-- Costo ejecutivo -->
+        <div>
+            <label for="costo_ejecutivo">Costo clase ejecutiva:</label>
+            <input type="number" id="costo_ejecutivo" name="costo_ejecutivo" step="0.01" min="0" required>
+        </div>
+
+        <!-- Costo unidad equipaje extra -->
+        <div>
+            <label for="costo_equipaje_extra">Costo unidad equipaje extra:</label>
+            <input type="number" id="costo_equipaje_extra" name="costo_equipaje_extra" step="0.01" min="0" required>
+        </div>
+
+        <!-- Ciudad origen -->
+        
+        <div>
+            <label for="ciudad_origen">Ciudad de origen:</label>
+            <select id="ciudad_origen" name="ciudad_origen" required></select>
+        </div>
+
+        <!-- Ciudad destino -->
+        <div>
+            <label for="ciudad_destino">Ciudad de destino:</label>
+            <select id="ciudad_destino" name="ciudad_destino" required></select>
+        </div>
+
+        <!-- Categorías -->
+        <div>
+            <label for="categorias">Categorías:</label>
+            <select id="categoriasSelector" name="categorias"></select>
+            <button onclick="event.preventDefault()" id="agregarCategoria">Agregar Categoria</button>
+        </div>
+
+        <div>
+            <label for="categorias_seleccionadas">Categorías seleccionadas:</label>
+            <ul id="categorias_seleccionadas"></ul>
+        </div>
+
+        <!-- Imagen opcional (full width) -->
+        <div class="full-width">
+            <label for="imagen">Subir imagen (opcional):</label>
+            <input type="file" id="imagen" name="imagen">
+        </div>
+
+        <!-- Enviar (submit button) -->
+        <div class="submit-btn">
+            <input id="submitBtt" type="submit" value="Registrar Ruta">
+        </div>
+    </form>
+    <error-popup id="errorAlta" ></error-popup>
+    <success-popup id="successAlta" hide="true" titulo="Ruta de vuelo registrada correctamente" ></success-popup>
+</div>
+
+<script type="module">
+    import ControladorUsuario from "./controladores/usuarios.js";
+    import ControladorVuelo from "./controladores/vuelos.js";
+    import {getUsuario} from "./utils/index.js";
+
+    const categoriasSeleccionadas = new Set();
+    
+    cargarCategorias();
+    cargarCiudades();
+
+    $('#root-alta-ruta-vuelo #agregarCategoria').on('click', async ()=>{
+        const categoria = $('#root-alta-ruta-vuelo #categoriasSelector').val();
+        if(!categoria){
+            console.log('Debe seleccionar una categoria')
+            $('#errorAlta').attr('message','Debe seleccionar una categoria')
+            return;
+        }
+        else if(categoriasSeleccionadas.has(categoria)){
+            $('#errorAlta').attr('message','La categoria ya fue seleccionada')
+            return;
+        }
+        else{
+            categoriasSeleccionadas.add(categoria);
+            console.log('categoria',categoriasSeleccionadas)
+            $('#root-alta-ruta-vuelo #categoriasSelector').val('');
+            const categoryElement = `
+                <li id="item_categoria_${categoria}" class="category-item">
+                    <div class="category-item-name">
+                        <span>${categoria}</span>
+                    </div>
+                    <div class="category-item-btn">
+                        <button id="btn_cerrar_categoria_${categoria}">X</button>
+                    </div>
+                </li>
+            `
+            $('#root-alta-ruta-vuelo #categorias_seleccionadas').append(categoryElement);
+            $(`#root-alta-ruta-vuelo #categorias_seleccionadas #btn_cerrar_categoria_${categoria}`).click((event)=>{
+                event.preventDefault();
+                categoriasSeleccionadas.delete(categoria)
+                $(`#root-alta-ruta-vuelo #categorias_seleccionadas #item_categoria_${categoria}`).remove();
+            })
+        }
+    })
+
+    $('#root-alta-ruta-vuelo #submitBtt').on('click', async ()=>{
+        const camposValidos = await validacion();
+        if(camposValidos){
+            const camposForm = getCamposForm();
+            const {nickname} = getUsuario();
+            await ControladorVuelo.altaRutaDeVuelo(nickname,camposForm.nombre,camposForm.descripcion,camposForm.hora,camposForm.costo_turista,camposForm.costo_ejecutivo,camposForm.costo_equipaje_extra,camposForm.ciudad_origen,camposForm.ciudad_destino,camposForm.categorias,camposForm.imagen,"Ingresada");
+            console.log('camposForm',camposForm)
+            //TODO: Mostrar mensaje de ruta de vuelo registrada correctamente
+            $('#successAlta').attr('hide',false)
+        } 
+    })
+    
+
+
+
+    async function validacion(){
+        const camposForm = getCamposForm();
+        //! TODO: hacer handling para los campos individuales
+        // const camposVacios = [];
+        // if(camposForm.nombre === '') camposVacios.push('nombre');
+        // if(camposForm.descripcion_corta === '') camposVacios.push('descripcion_corta');
+        // if(camposForm.descripcion === '') camposVacios.push('descripcion');
+        // if(camposForm.hora === '') camposVacios.push('hora');
+        // if(camposForm.costo_turista === '') camposVacios.push('costo_turista');
+        // if(camposForm.costo_ejecutivo === '') camposVacios.push('costo_ejecutivo');
+        // if(camposForm.costo_equipaje_extra === '') camposVacios.push('costo_equipaje_extra');
+        // if(camposForm.ciudad_origen === '') camposVacios.push('ciudad_origen');
+        // if(camposForm.ciudad_destino === '') camposVacios.push('ciudad_destino');
+
+        if(camposForm.nombre === '' || camposForm.descripcion_corta === '' || camposForm.descripcion === '' || camposForm.hora === '' || camposForm.costo_turista === '' || camposForm.costo_ejecutivo === '' || camposForm.costo_equipaje_extra === '' || camposForm.ciudad_origen === '' || camposForm.ciudad_destino === ''){
+            $('#errorAlta').attr('message','Falto algun campo obligatorio')
+            return false;
+        }
+        if(camposForm.costo_turista < 0 || camposForm.costo_ejecutivo < 0 || camposForm.costo_equipaje_extra < 0){
+            $('#errorAlta').attr('message','Los costos no pueden ser negativos')
+            return false;
+        }
+        if(camposForm.ciudad_origen === camposForm.ciudad_destino){
+            $('#errorAlta').attr('message','La ciudad de origen y destino no pueden ser la misma')
+            return false;
+        }
+        return true;
+    }
+
+    function getCamposForm(){
+        const nombre = $('#root-alta-ruta-vuelo #nombre').val();
+        const descripcion_corta = $('#root-alta-ruta-vuelo #descripcion_corta').val();
+        const descripcion = $('#root-alta-ruta-vuelo #descripcion').val();
+        const hora = $('#root-alta-ruta-vuelo #hora').val();
+        const costo_turista = $('#root-alta-ruta-vuelo #costo_turista').val();
+        const costo_ejecutivo = $('#root-alta-ruta-vuelo #costo_ejecutivo').val();
+        const costo_equipaje_extra = $('#root-alta-ruta-vuelo #costo_equipaje_extra').val();
+        const ciudad_origen = $('#root-alta-ruta-vuelo #ciudad_origen').val();
+        const ciudad_destino = $('#root-alta-ruta-vuelo #ciudad_destino').val();
+        const categorias = Array.from(categoriasSeleccionadas);
+        const imagen = $('#root-alta-ruta-vuelo #imagen').val();
+        console.log('ciduad',ciudad_origen)
+        return {
+            nombre,
+            descripcion_corta,
+            descripcion,
+            hora,
+            costo_turista,
+            costo_ejecutivo,
+            costo_equipaje_extra,
+            ciudad_origen,
+            ciudad_destino,
+            categorias,
+            imagen
+        }
+    }
+
+    async function cargarCategorias(){
+        const categorias = await ControladorVuelo.listarCategorias();
+        const selectorCategorias = $('#root-alta-ruta-vuelo #categoriasSelector');
+        categorias.forEach(categoria => {
+            selectorCategorias.append(`<option value="${categoria}">${categoria}</option>`)
+        })
+        $('#root-alta-ruta-vuelo #categoriasSelector').val('');
+    }
+
+    async function cargarCiudades(){
+        const ciudades = await ControladorVuelo.listarCiudades();
+        const selectorCiudadOrigen = $('#root-alta-ruta-vuelo #ciudad_origen');
+        const selectorCiudadDestino = $('#root-alta-ruta-vuelo #ciudad_destino');
+        ciudades.forEach(ciudad => {
+            selectorCiudadOrigen.append(`<option value="${ciudad.nombre}">${ciudad.nombre}</option>`)
+            selectorCiudadDestino.append(`<option value="${ciudad.nombre}">${ciudad.nombre}</option>`)
+        })
+        $('#root-alta-ruta-vuelo #ciudad_origen').val('');
+        $('#root-alta-ruta-vuelo #ciudad_destino').val('');
+    }
+
+</script>
+<style>
+    #root-alta-ruta-vuelo{
+        padding: 2rem;
+    }
+    h1 {
+        text-align: center;
+    }
+    form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input, textarea, select {
+        width: 100%;
+    }
+    textarea {
+        resize: vertical;
+    }
+    .full-width {
+        grid-column: 1 / 3;
+    }
+    .submit-btn {
+        grid-column: 1 / 3;
+        text-align: center;
+    }
+    input[type="submit"] {
+        background-color: var(--purple-primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: var(--purple-hover);
+    }
+
+    #categorias_seleccionadas{
+        padding: 0;
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        flex-wrap: wrap;
+        overflow-y: scroll;
+        max-height: 100px;
+        margin:0
+    }
+
+    .category-item{
+        /* tamaño en base a lo que ocupe el contenido */
+        width: fit-content;
+        display: flex;
+        justify-content: space-between;
+        gap: 5px;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 3px;
+    }
+
+    .category-item-btn{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .category-item-btn button{
+        border: none;
+        padding: 5px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: red;
+    }
+    
+</style>
+

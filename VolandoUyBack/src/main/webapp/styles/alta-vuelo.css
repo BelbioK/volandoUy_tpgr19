@@ -1,0 +1,81 @@
+#root-alta-vuelo {
+    padding: 2rem;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.full-width {
+    grid-column: 1 / 3;
+}
+
+.submit-btn {
+    grid-column: 1 / 3;
+    text-align: center;
+}
+
+.boton {
+    background-color: var(--purple-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.invalid-value {
+    border: rgb(247, 95, 95) solid 2px;
+}
+
+#errorContainer {
+    position: fixed;
+    right: 10px; 
+    bottom: 10px; 
+    background-color: var(--red-primary);
+    border-radius: 5px; 
+    padding: 10px; 
+    z-index: 1000; 
+    display: none; 
+}
+
+#errorMessage {
+    color: white;
+    font-size: 14px; 
+    font-weight: normal; 
+    margin: 0; 
+}
+.close {
+    color: white;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}

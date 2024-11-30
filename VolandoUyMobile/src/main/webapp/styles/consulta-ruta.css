@@ -1,0 +1,128 @@
+#cola{
+        display: flex;
+        justify-content: space-between;
+    }
+    #cola2{
+        display: flex;
+    }
+    #root-consulta-ruta{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 4fr 2fr;
+        overflow-x: auto;
+    }
+    .info-ruta{
+		display: flex;
+		gap: 10px;
+	}
+	.info-ruta img{
+		width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin: 8px;
+        align-self: center;
+	}
+	.ruta-general-info{
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+    @media screen and (max-width: 840px) {
+		#root-consulta-ruta,#info-ciudades{
+			grid-template-columns:1fr !important;
+		}
+		.info-ruta{
+			flex-direction: column;
+		}
+	}
+    #EstadoCuadrado{
+        padding: 1rem;
+        border-radius: 100px;
+
+    }
+    #info-section{
+        width: 100%;
+        display: grid;
+        grid-template-rows: auto auto auto;
+        align-items: center;
+        gap:10px
+    }
+    #links-section{
+        padding: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    #cards{
+        display: grid; 
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: "superior"
+                            "inferior";
+    }
+    .mini-cards-superiores{
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        justify-items: center;
+        align-items: center; 
+        margin-bottom: 2rem;
+        grid-area: superior;
+    }
+    .mini-cards-inferiores{
+        grid-area: inferior;
+        margin-top: 0; 
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    #info-ciudades{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    #info-origen{
+        justify-self: center;
+        align-items: center;
+    }
+    #info-destino{
+        justify-self:center;
+    }
+    #categorias span{
+        margin-right: 5px;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+    #nombre-origen, #pais-origen, #aeropuerto-origen, #sitioWeb-origen, #nombre-destino, #pais-destino, #aeropuerto-destino, #sitioWeb-destino{
+        text-align: center;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+        margin: 1%;
+    }
+    

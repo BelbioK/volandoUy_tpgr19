@@ -1,0 +1,70 @@
+	#root-consulta-vuelo{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-rows: 1fr 4fr;
+    }
+
+    #info-section{
+        width: 100%;
+        align-items: center;
+    }
+    #links-section{
+        padding-right: 3rem;
+        padding-left: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc > img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin: 8px;
+    }
+    .mini-cards-paquete{
+        margin-top: -5rem;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    .info-asientos-vuelo{
+        grid-row: 1;
+        grid-column: 2;
+        display: flex;
+        margin-top: 30px;
+    }
+    #info-aerolinea-prop{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .info-reservas{
+        padding-left: 2rem;
+    }
+    .info-reserva-unica{
+        margin-bottom: 8px;
+    }
+    .ancla-contenedor{
+	display: block;
+	text-decoration: none;
+	color: black;
+	}
+	

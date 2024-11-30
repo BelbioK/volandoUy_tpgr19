@@ -1,0 +1,165 @@
+*{
+    box-sizing: border-box;
+}
+.card{
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 150px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    grid-template-rows: 1fr 1fr 2fr 1fr;
+    grid-template-areas:'image title' 
+                        'image subtitle'
+                        'image content'
+                        'image additionalInfo';
+    transition: all 0.3s;
+}
+.card:hover{
+    background-color: #f4f4f9;
+}
+.card-image{
+    padding: 5px;
+    grid-area: image;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+.card-image img{
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+.card-title{
+    grid-area: title;
+
+}
+.card-subtitle{
+    grid-area: subtitle;
+
+}
+.card-content{
+    grid-area: content;
+    font-size: 0.7em;
+}
+.card-additionalInfo{
+    grid-area: additionalInfo;
+    height: 100%;
+    width: 100%;
+}
+.ancla-contenedor{
+	display: block;
+	text-decoration: none;
+	color: black;
+}
+#cola{
+        display: flex;
+        justify-content: space-between;
+    }
+    #cola2{
+        display: flex;
+    }
+    #root-consulta-ruta{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 4fr 2fr;
+        
+    }
+    #EstadoCuadrado{
+        padding: 1rem;
+        border-radius: 100px;
+
+    }
+    #info-section{
+		height: 85vh;
+        width: 100vh;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+        align-items: center;
+    }
+    #links-section{
+        padding: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    #cards{
+        display: grid; 
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: "superior"
+                            "inferior";
+    }
+    .mini-cards-superiores{
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        justify-items: center;
+        align-items: center; 
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        grid-area: superior;
+    }
+    .mini-cards-inferiores{
+        grid-area: inferior;
+        margin-top: 0; 
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    	justify-items: center;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    #info-ciudades{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "origenGrid destinoGrid";
+    }
+    #info-origen{
+        grid-area: origenGrid;
+        justify-self: center;
+        align-items: center;
+    }
+    #info-destino{
+        grid-area: destinoGrid;
+        justify-self:center;
+    }
+    #categorias span{
+        margin-right: 5px;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+    #nombre-origen, #pais-origen, #aeropuerto-origen, #sitioWeb-origen, #nombre-destino, #pais-destino, #aeropuerto-destino, #sitioWeb-destino{
+        text-align: center;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+        margin: 1%;
+    }
+    

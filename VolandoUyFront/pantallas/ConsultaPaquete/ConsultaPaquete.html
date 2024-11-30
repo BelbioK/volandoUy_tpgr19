@@ -1,0 +1,109 @@
+<div id="root-consulta-paquete">
+    <div id="info-section">
+        <div class="imagen-nombre-desc">
+            <img id="imagen-paquete">
+            <div>
+                <h2 class="name" id="nombre-paquete"></h2>
+                <span class="desc" id="desc-paquete"></span>
+            </div>
+        </div>
+        <div class="mini-cards-paquete">
+            <div class="mini-card">
+                <span>Dias de validez</span>
+                <h4 id="card-validez-paquete">100</h4>
+            </div>
+            <div class="mini-card">
+                <span>Descuento</span>
+                <h4 id="card-descuento-paquete">100</h4>
+            </div>
+            <div class="mini-card">
+                <span>Fecha de creación</span>
+                <h4 id="fecha-creacion-paquete">100</h4>
+            </div>
+        </div>
+    </div>
+    <div id="links-section">
+        <p style="margin-top: 1rem; font-size: 20px;">Aplica en</p>
+        <resource-list id="rutas-paquete">
+        </resource-list>
+    </div>
+</div>
+<script type="module" src="./componentes/base/resource-list/resource-list.js"></script>
+<script type="module">
+    import ControladorPaquete from './controladores/paquetes.js'
+    import {getUsuario} from "./utils/index.js"
+
+    try {
+        const params = JSON.parse(localStorage.getItem("params"))
+        const paqueteNombre = params.paquete;
+        
+        const getPaquete = async ()=>{
+            const paquete = await ControladorPaquete.consultarPaquete(paqueteNombre);
+            // $('#info-section').html(JSON.stringify(paquete));
+            $("#imagen-paquete").attr("src","./assets/imagenes-precargadas/"+paquete.imagen)
+            $("#nombre-paquete").html(paquete.nombre)
+            $("#desc-paquete").html(paquete.descripcion)
+            $("#card-validez-paquete").html(paquete.periodoDeValidez)
+            $("#card-descuento-paquete").html(paquete.descuento+"%")
+            $("#fecha-creacion-paquete").html(paquete.fechaAlta)
+
+            $("#rutas-paquete").attr("items",JSON.stringify(paquete.rutas.map(r => ({name:r.nombre+" "+r.cantidad+" pasajes",key:r.nombre,image:"./assets/imagenes-precargadas/"+r.imagen}))))
+            $("#rutas-paquete").attr("path","/consultaRuta")
+            $("#rutas-paquete").attr("paramkey","ruta")
+        }
+        getPaquete();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+
+<style>
+    #root-consulta-paquete{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 4fr 2fr;
+    }
+
+    #info-section{
+        width: 100%;
+        display: grid;
+        grid-template-rows: 2fr 3fr;
+        align-items: center;
+    }
+    #links-section{
+        padding: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    .mini-cards-paquete{
+        margin-top: -5rem;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+</style>

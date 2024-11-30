@@ -1,0 +1,33 @@
+:root{
+    /* --purple-primary: #57A4FF;
+    --purple-light: #9BC9FF; */
+    --purple-primary: #A7ABDD;
+    --purple-light: #D3D5EE;
+    --purple-hover:#8288cf;
+
+    --red-primary: rgb(238, 102, 102);
+    --green-primary: #B2E0B2;
+    --green-hover: #4CAF50;
+}
+*{
+    box-sizing: border-box;
+}
+body{
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+    display: grid;
+    grid-template-rows: 1fr 9fr;
+    grid-template-columns: 2fr 10fr;
+    grid-template-areas: 'header header'
+                         'sidebar content';
+    font-family: "Montserrat", sans-serif;
+}
+
+input, select, textarea{
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

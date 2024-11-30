@@ -1,0 +1,68 @@
+<div id ='root-listar-usuarios'>
+
+</div>
+
+<script type = 'module' src="./componentes/base/card/card.js"></script>
+<script type="module">
+    import ControladorUsuario from './controladores/usuarios.js'
+    import {navigate} from './utils/index.js'
+
+    try {
+        const filtros = JSON.parse(localStorage.getItem("filtros"))
+        const listarUsuarios = async () =>{
+            let usuariosList = await ControladorUsuario.listarUsuarios();
+            if(filtros.busqueda) {
+                let busqueda = filtros.busqueda;
+                usuariosList = usuariosList.filter(usu => usu.nombre.toLowerCase().includes(busqueda.toLowerCase()));
+            }
+            
+            if(filtros.tipo) {
+                let tipoFiltro = filtros.tipo;
+                usuariosList = usuariosList.filter(usu => usu.tipo === tipoFiltro);
+            }
+            
+            $('#root-listar-usuarios').html(usuariosList.map((u, i) =>
+                `<info-card id='card-${i}' data='${JSON.stringify({
+                    image:`./assets/imagenes-precargadas/${u.imagen}`,
+                    title: u.nickname,
+                    content: u.apellido ? u.nombre + ' ' + u.apellido : u.nombre
+                })}'>
+                    <slot slot="additionalInfo" class="row-usuTipo">
+                        <span>${u.apellido != null ? 'Cliente' : 'Aerolínea'}</span>
+                    </slot>
+                </info-card>`
+            ).join('')); 
+
+            usuariosList.forEach((u,i) =>{
+                $(`#card-${i}`).click(()=>{
+                    console.log(u.nickname)
+                    navigate("/consultarUsuario",{nickname: u.nickname})
+                })
+            });                                    
+        }
+        listarUsuarios();
+    } catch (e) {
+        console.error(e)
+    }
+
+</script>
+<style>
+
+    #root-listar-usuarios{
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+    }
+    .row-usuTipo{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-usuTipo span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+
+</style>

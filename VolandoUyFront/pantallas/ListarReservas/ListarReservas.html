@@ -1,0 +1,77 @@
+<div id="root-listar-paquetes">
+
+</div>
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module">
+    import ControladorVuelo from './controladores/vuelos.js'
+    import {navigate,getUsuario} from "./utils/index.js"
+    try {
+        const filtros = JSON.parse(localStorage.getItem("filtros")) || {};
+        
+        const listarPaquetes = async ()=>{
+            let reservas = getUsuario().tipo == 'aerolinea' ? await ControladorVuelo.listarReservasAerolinea() : await ControladorVuelo.listarReservasCliente();
+            reservas = reservas.filter(r => (!filtros.busqueda || r.vuelo.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()) || r.ruta.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()))
+                                            && (!filtros.aerolinea || r.aerolinea.nickname == filtros.aerolinea)
+                                            && (!filtros.ruta || r.ruta.nombre == filtros.ruta)
+                                            && (!filtros.vuelo || r.vuelo.nombre == filtros.vuelo))
+            $('#root-listar-paquetes').html(reservas.map((r,i) => `<info-card id='card-${i}' data='${JSON.stringify({image:`./assets/imagenes-precargadas/${r.vuelo.imagen}`,
+                                                                                                                    title:r.vuelo.nombre,
+                                                                                                                    content:`Reserva al vuelo ${r.vuelo.nombre} con ruta ${r.ruta.nombre} y ${r.equipajeExtra} equipajes extra`})}'>
+                                                                    <slot slot='subtitle'>
+                                                                        <span class='tipoAsiento fecha'>
+                                                                            ${r.vuelo.fecha} ${r.ruta.hora}    
+                                                                        </span>
+                                                                        <span class='tipoAsiento ${r.tipoAsiento}'>
+                                                                            ${r.tipoAsiento}
+                                                                        </span>
+                                                                    </slot>
+                                                                    <slot slot="additionalInfo" class="row-categorias">
+                                                                        ${r.pasajes.map(p => `<span>${p.nombre} ${p.apellido}</span>`).join('')}
+                                                                    </slot>
+                                                                </info-card>`).join(''));
+
+            reservas.forEach((r,i) =>{
+                $(`#card-${i}`).click(()=>{
+                    navigate("/consultaReserva",{vuelo:r.vuelo.nombre,cliente:r.cliente.nickname})
+                })
+            });
+        }
+        listarPaquetes();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+<style>
+ #root-listar-paquetes{
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+ }
+ .row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-categorias span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+    .tipoAsiento{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+        margin-right: 1rem;
+    }
+    .fecha{
+        background-color: rgb(207, 146, 226);
+    }
+    .ejecutivo{
+        background-color: rgb(226, 146, 213);
+    }
+    .turista{
+        background-color: rgb(146, 194, 226);
+    }
+</style>

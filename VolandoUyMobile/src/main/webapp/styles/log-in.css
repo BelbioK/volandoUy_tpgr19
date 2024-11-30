@@ -1,0 +1,53 @@
+@charset "ISO-8859-1";
+
+.login-form {
+	display: grid;
+	grid-template-rows: 1fr 1fr 30px;
+	gap: 20px;
+	max-width: 500px;
+	margin: auto;
+	padding: 20px;
+	border-radius: 8px;
+}
+
+.login-form h2 {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.login-form button {
+	width: 100%;
+	padding: 10px;
+	height: 3rem;
+	background-color: var(--purple-primary);
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.login-form button:hover {
+	background-color: var(--purple-hover);
+}
+
+#password,
+#nickname {
+	width: 100%;
+	margin-top: 8px;
+}
+
+#registrar {
+	font-size: smaller;
+	text-align: center;
+}
+
+.invalid-value {
+	border: 1px solid red;
+}
+
+#side-bar-aplicar-filtros{
+	display: none;
+}
+#login-root input{
+	height: 2.5rem;
+}

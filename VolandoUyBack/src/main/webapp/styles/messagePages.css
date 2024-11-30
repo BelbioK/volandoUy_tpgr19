@@ -1,0 +1,90 @@
+:root {
+	/* --purple-primary: #57A4FF;
+    --purple-light: #9BC9FF; */
+	--purple-primary: #A7ABDD;
+	--purple-light: #D3D5EE;
+	--purple-hover: #8288cf;
+
+	--red-primary: rgb(238, 102, 102);
+	--red-hover:#e93838;
+	--green-primary: #B2E0B2;
+	--green-hover: #4CAF50;
+}
+
+html{
+	height: 100%;
+}
+
+body {
+	text-align: center;
+	padding: 40px 0;
+	background: var(--green-primary);
+	height: 80%;
+}
+
+h1 {
+	color: var(--green-primary);
+	font-family: "Montserrat", sans-serif;
+	font-weight: 900;
+	font-size: 40px;
+}
+
+.card-wrapper{
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+.card {	
+	display: flex;
+    background: white;
+    padding: 60px;
+    border-radius: 1rem;
+    box-shadow: 0px 5px 13px 15px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    min-height: fit-content;
+    height: 50%;
+    max-height: 600px;
+    min-width: fit-content;
+    max-width: 500px;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.message {
+	font-size: 20px;
+	color: #404F5E;
+	font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+	font-size: 20px;
+	margin: 10px;
+}
+
+.button {
+	padding: 10px 20px;
+	background-color: var(--purple-primary);
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	text-decoration: none;
+	margin: 10px;
+	display: inline-block;
+}
+
+.button:hover {
+	background-color: var(--purple-hover);
+}
+
+.wrapper-card {
+	width: 50%;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.icon {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}

@@ -1,0 +1,133 @@
+.navbar {
+	position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 0 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 15px 15px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #6d6c7c;
+    text-decoration: none;
+}
+
+.navbar-logo span {
+    color: var(--purple-primary);
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #f4f4f9;
+    padding: 5px 10px;
+    border-radius: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-input {
+    width: 300px;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background-color: transparent;
+    font-size: 0.9rem;
+    outline: none;
+    color: #a3a3b1;
+    box-shadow: none;
+}
+
+.search-button {
+    background-color: #dcdaf3;
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #b8b5ec;
+}
+
+.right-links {
+    display: flex;
+    align-items: center;
+}
+
+.right-links .button{
+    height: 2rem;
+    border: none;
+    background-color: #f4f4f9;
+    border-radius: 1rem;
+    transition: all 0.3s;
+}
+.right-links .button:hover{
+    background-color: #a3a3b1;
+}
+.button.login{
+    background-color: var(--purple-primary);
+}
+
+
+.profile {
+    position:relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.profile-name {
+    font-size: 0.9rem;
+    color: #6d6c7c;
+}
+.profile-menu.hide{
+    display: none;
+}
+.profile-menu{
+	z-index: 999;
+    display: flex;
+    border-radius: 10px;
+    background-color: #ffffff;
+    width: 150px;
+    position:absolute;
+    right: 0;
+    bottom: -100%;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.profile-menu span{
+    border-radius: 10px;
+    transition: all 0.3s;
+    padding: 5px;
+}
+.profile-menu a{
+	display: block;
+}
+
+.profile-menu span:hover{
+    background-color: #dcdaf3;
+}

@@ -1,0 +1,466 @@
+<style>
+    /* Basic styling for the login form */
+    #registro-root{
+      padding: 2rem;
+    }
+    .registro-form {
+      font-family: Arial, sans-serif;
+      display: grid;
+      gap: 20px;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .registro-form h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #aceptar{
+      height:70%;
+      background-color: var(--purple-primary);
+      margin-top:auto;
+      transition: all 0.3s;
+    }
+    #aceptar:hover{
+      background-color: var(--purple-hover);
+    }
+    .registro-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--purple-primary);
+      color: white;
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: large;
+      margin-right: 10px;
+      margin-top: 8px;
+      transition: all 0.3s;
+    }
+    .registro-form button:hover {
+      background-color: var(--purple-hover);
+    }
+
+    input,select {
+      width: 100%;
+      margin-top: 8px;
+    }
+    .error{
+      color: red;
+      font-size: smaller;
+      text-align: center;
+    }
+    #registrar{
+      font-size: smaller;
+      text-align: center;
+    }
+    #botones-tipo-usuario{
+      display: flex;
+    }
+    #datos-usuario{
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+    }
+    .input-text {
+      display: block;
+      margin-top: 18px;
+    }
+    .coso-coso{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .inputs-form{
+      margin-right: 10px;
+    }
+  </style>
+  
+  
+  <div id="registro-root">
+    <!-- <h2 style="text-align: center;">Registro</h2> -->
+    <div id="registroForm" class="registro-form">
+
+      <div id="datos-usuario">
+
+        <div id="nick-email" class="coso-coso">
+          <div class="inputs-form">
+            <label class="input-text" for="nickname">Nickname:</label>
+            <input type="text" id="nickname" name="nickname" placeholder="Ingrese su nickname" required>
+          </div>
+          
+          <div class="inputs-form">
+            <label class="input-text" for="email">Email:</label>
+            <input type="text" id="email" name="email" placeholder="Ingrese su email" required>
+          </div>
+        </div>
+          
+        <div id="contrasena-contrasena" class="coso-coso">
+          <div class="inputs-form">
+            <label class="input-text" for="contraseña">Contraseña:</label>
+            <input type="password" id="contraseña" name="contraseña" placeholder="Ingrese su contraseña" required>
+          </div>
+
+          <div class="inputs-form">
+            <label class="input-text" for="contraseña2">Repita la contraseña:</label>
+            <input type="password" id="contraseña2" name="contraseña2" placeholder="Repita la contraseña" required>
+          </div>
+        </div>
+
+        <div>
+          <div class="inputs-form">
+            <label class="input-text" for="imagen">Subir imagen (opcional):</label>
+            <input type="file" id="imagen" name="imagen">
+          </div>
+        </div>
+
+      </div>
+
+    
+      <div id="tipo-usuario">
+        <label>Elija su tipo de usuario</label>
+        <div id="botones-tipo-usuario" class="coso-coso">
+          <button id="boton-cliente">Cliente</button>
+          <button id="boton-aerolinea">Aerolinea</button>
+        </div>
+      </div>
+
+
+
+
+
+      <div id="full-info">
+        
+      </div>
+
+
+
+
+    </div>
+      <error-popup id="mensaje-error" ></error-popup>
+      <success-popup id="confirmacion-registro" hide="true" titulo="Se creó el usuario con éxito!" subtitulo="Gracias por unirse a nuestra plataforma :D"></success-popup>
+      <p id="registrar">¿Ya tienes una cuenta? <a id="login" href="">Iniciar Seción</a></p>
+  </div>
+
+  <script type="module" src="../../componentes/base/success-popup/success-popup.js"></script>
+  <script type="module">
+    import ControladorUsuario from "./controladores/usuarios.js"
+    import {navigate} from './utils/index.js'
+    import {getUsuario} from "./utils/index.js"
+    
+    var nick = $('#nickname').val().toLowerCase();
+    var email = $('#email').val().toLowerCase();
+    var contrasena = $('#contraseña').val()
+    var contrasena2 = $('#contraseña2').val()
+    var foto = $("#imagen").val()
+    var tipoUsuario;
+
+    function verificar_nick_email_contrasenia(abierto=false){
+      nick = $('#nickname').val().toLowerCase();
+      email = $('#email').val().toLowerCase();
+      contrasena = $('#contraseña').val()
+      contrasena2 = $('#contraseña2').val()
+      foto = $("#imagen").val()
+      
+      if(!nick) {
+        $('#mensaje-error').attr('message',"Falta ingresar nickname")
+        return false
+      }
+      if(!email) {
+        $('#mensaje-error').attr('message',"Falta ingresar email")
+        return false
+      }
+      if(!contrasena) {
+        $('#mensaje-error').attr('message',"Falta ingresar una contraseña")
+        return false
+      }
+      
+      const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if(!regexEmail.test(email)){
+        $('#mensaje-error').attr('message',"El correo no es válido")
+        return false
+      }
+      if(!(contrasena == contrasena2)){
+        $('#mensaje-error').attr('message',"Las contraseñas no coinciden")
+        return false
+      }
+      
+      if(!abierto) $("#full-info").html("")
+      return true
+    }
+
+    $('#boton-cliente').on('click', async (event) => {
+      if(!verificar_nick_email_contrasenia()) return
+      const html = `
+      <div id="nombre-apellido" class="coso-coso">
+          <div class="inputs-form">
+              <label class="input-text" for="nombre">Nombre:</label>
+              <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+          </div>
+  
+          <div class="inputs-form">
+              <label class="input-text" for="apellido">Apellido:</label>
+              <input type="text" id="apellido" name="apellido" placeholder="Ingrese su apellido" required>
+           </div>
+      </div>
+      <div id="documento-tipo" class="coso-coso">
+          <div>
+              <div class="inputs-form">
+                  <label class="input-text" for="tipo-documento">Tipo documento:</label>
+                  <select style="margin-top: 8px;" id="tipoDoc">
+                      <option value="opcion1">Cédula</option>
+                      <option value="opcion2">Pasaporte</option>
+                  </select>
+              </div>
+          </div>
+          <div class="inputs-form">
+              <label class="input-text" for="documento">Documento:</label>
+              <input type="text" id="documento" name="documento" placeholder="Ingrese su documento" required>
+          </div>
+      </div>
+      <div id="fecha-boton" class="coso-coso">
+          <div class="inputs-form">
+              <label class="input-text" for="fecha-nacimiento">Fecha de nacimiento:</label>
+              <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" placeholder="Ingrese su fecha de nacimiento" required>
+          </div>
+          <div class="inputs-form">
+              <label class="input-text" for="nacionalidad">Nacionalidad:</label>
+              <input type="text" id="nacionalidad" name="nacionalidad" placeholder="Ingrese su nacionalidad" required>
+          </div>    
+      </div>
+      <div id="fecha-boton" style="margin-top: 18px; margin-right: 8px;">
+            <button id="aceptar">Ingresar Datos</button> 
+          </div>`
+      $("#full-info").html(html)
+      $("#aceptar").on("click", async () => {
+        verificar_cliente_totalidad_y_enviar()
+      })
+      $("#boton-cliente").css("background-color", "var(--purple-hover)")
+      $("#boton-aerolinea").css("background-color", "var(--purple-primary)")
+      tipoUsuario = "Cliente"
+    });
+
+    $('#boton-aerolinea').on('click', async (event) => {
+      if(!verificar_nick_email_contrasenia()) return
+      const html = `
+        <div id="nombre-link" class="coso-coso">
+            <div class="inputs-form">
+                <label class="input-text" for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+            </div>
+    
+            <div class="inputs-form">
+                <label class="input-text" for="link">Link a pagina web (Opcional):</label>
+                <input type="text" id="link" name="link" placeholder="Ingrese su link" required>
+            </div>
+        </div>
+        <div id="descripcion-form">
+            <div>
+                <div class="inputs-form">
+                    <label class="input-text" for="tipo-documento">Descripción:</label>
+                    <input type="text" id="descripcion" name="descripcion" placeholder="Ingrese su descripción" required>
+                </div>
+            </div>
+        </div>
+        <div id="fecha-boton" style="margin-top: 18px; margin-right: 8px;">
+            <button id="aceptar">Ingresar Datos</button> 
+        </div>
+      `
+      $("#full-info").html(html)
+      $("#aceptar").on("click", async () => {
+        verificar_aerolinea_totalidad_y_enviar()
+      })
+      $("#boton-aerolinea").css("background-color", "var(--purple-hover)")
+      $("#boton-cliente").css("background-color", "var(--purple-primary)")
+      tipoUsuario = "Aerolinea"
+    });
+
+    const verificar_cliente_totalidad_y_enviar = async () =>{
+      if(!verificar_nick_email_contrasenia(true)) return
+      let nombre = $("#nombre").val()
+      let apellido = $("#apellido").val()
+      let tipoDoc = $("#tipoDoc").val()
+      let documento = $("#documento").val()
+      let fechaNac = cambiarFormatoFecha($("#fecha-nacimiento").val())
+      let nacionalidad = $("#nacionalidad").val()
+      const fechaActual = formatearFecha(new Date())
+
+      if(!nombre){
+        $('#mensaje-error').attr('message',"Falta ingresar un nombre")
+        return
+      }
+      if(!apellido){
+        $('#mensaje-error').attr('message',"Falta ingresar un apellido")
+        return
+      }
+      if(!documento){
+        $('#mensaje-error').attr('message',"Falta ingresar un documento")
+        return
+      }
+      if(!fechaNac){
+        $('#mensaje-error').attr('message',"Falta ingresar una fecha de nacimiento")
+        return
+      }
+
+      if(fechaNac > fechaActual){
+        $('#mensaje-error').attr('message',"La fecha de nacimiento no puede ser mayor al día de la fecha")
+        return
+      }
+      if(tipoDoc == "Cédula" && !validarCedula(documento)){
+        $('#mensaje-error').attr('message',"La cédula no coincide con el formato")
+        return
+      }
+      if(tipoDoc == "Pasaporte" && !validarPasaporte(documento)){
+        $('#mensaje-error').attr('message',"El pasaporte no coincide con el formato")
+        return
+      }
+
+      const cliente = {
+        tipo: "cliente",
+        nickname: nick,
+        correo: email,
+        nombre: nombre,
+        apellido: apellido,
+        tipoDoc: tipoDoc,
+        numeroDoc: documento,
+        nacionalidad: nacionalidad,
+        contrasenia: contrasena,
+        imagen: foto,
+        fechaAlta: fechaActual
+      }
+      console.log(cliente)
+      const caso = await ControladorUsuario.altaUsuario(cliente)
+      
+      $("#confirmacion-registro").attr("hide","false");
+    }
+
+    const verificar_aerolinea_totalidad_y_enviar = async () => {
+      if(!verificar_nick_email_contrasenia(true)) return
+      let nombre = $("#nombre").val()
+      let link = $("#link").val()
+      let desc = $("#descripcion").val()
+      const regex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+      const fechaActual = formatearFecha(new Date())
+      
+      if(!nombre){
+        $('#mensaje-error').attr('message',"Falta ingresar un nombre")
+        return
+      }
+      if(!desc){
+        $('#mensaje-error').attr('message',"Falta ingresar una descripción")
+        return
+      }
+
+      if(link && !regex.test(link)){
+        $('#mensaje-error').attr('message',"El link no coincide con el formato")
+        return
+      }
+
+      const aerolinea = {
+        tipo: "aerolinea",
+        nickname: nick,
+        nombre: nombre,
+        correo: email,
+        contrasenia: contrasena,
+        imagen: foto,
+        fechaAlta: fechaActual,
+        descripcion: desc,
+        sitioWeb: link
+      }
+      console.log(aerolinea)
+      const caso = await ControladorUsuario.altaUsuario(aerolinea)
+      $("#confirmacion-registro").attr("hide","false");
+    } 
+
+    
+    $('#login').on('click', async function(event) {
+      event.preventDefault();
+      navigate("/login")
+    })
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //funciones auxiliares dadas por chatgepeteo
+
+    const formatearFecha = (date) => {
+      const año = date.getFullYear(); // Obtiene el año
+      const dia = String(date.getDate()).padStart(2, '0'); // Obtiene el día y lo formatea a 2 dígitos
+      const mes = String(date.getMonth() + 1).padStart(2, '0'); // Obtiene el mes (0-11) y lo formatea a 2 dígitos
+
+      return `${año}-${mes}-${dia}`; // Devuelve la fecha en el formato deseado
+    } 
+
+    function cambiarFormatoFecha(fecha) {
+      // Verifica que la fecha tenga el formato correcto
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if(!fecha){
+        return
+      }
+      if (!regex.test(fecha)) {
+          throw new Error("El formato de la fecha debe ser yyyy-dd-mm");
+      }
+
+      // Divide la fecha en sus componentes
+      const [año, dia, mes] = fecha.split('-');
+
+      // Devuelve la fecha en el nuevo formato
+      return `${año}-${mes}-${dia}`;
+    }
+    function validarCedula(cedula) {
+      // Eliminar espacios y caracteres no numéricos
+      cedula = cedula.replace(/\D/g, '');
+
+      // Verificar que la cédula tenga 8 dígitos
+      if (cedula.length !== 8) {
+          return false;
+      }
+
+      // Convertir la cédula en un array de números
+      const numeros = cedula.split('').map(Number);
+
+      // Calcular el dígito de control
+      const digitoControl = numeros.pop(); // El último dígito es el dígito de control
+      let suma = 0;
+
+      // Multiplicadores para el cálculo del dígito de control
+      const multiplicadores = [2, 9, 8, 7, 6, 5, 4];
+
+      for (let i = 0; i < 7; i++) {
+          suma += numeros[i] * multiplicadores[i];
+      }
+
+      // Calcular el dígito de control
+      const resto = suma % 10;
+      const digitoCalculado = (resto === 0) ? 0 : 10 - resto;
+
+      // Comparar el dígito calculado con el dígito de control
+      return digitoCalculado === digitoControl;
+    }
+
+    function validarPasaporte(pasaporte) {
+      // Eliminar espacios y caracteres no válidos
+      pasaporte = pasaporte.trim();
+
+      // Verificar que el pasaporte tenga entre 6 y 9 caracteres y contenga solo letras y números
+      const regex = /^[A-Z0-9]{6,9}$/;
+
+      return regex.test(pasaporte);
+  }
+
+  </script>

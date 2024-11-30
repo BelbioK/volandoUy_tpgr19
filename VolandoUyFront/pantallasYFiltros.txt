@@ -1,0 +1,23 @@
+
+home
+login
+
+alta usuario, modificar usuario //Reusar alta usuario
+listar usuarios
+consulta usuario
+
+alta ruta de vuelo
+listar rutas de vuelo //filtros aerolinea, estado y categorias
+consulta ruta de vuelo
+
+alta vuelo
+listar vuelos //filtros aerolinea y ruta
+consulta vuelo
+
+Reservar vuelo
+Listar reservas //filtros: aerolinea(ruta y vuelo) cliente(aerolinea,ruta,vuelo)
+Consulta reserva
+
+Listar paquete //filtros: ruta de vuelo
+Consulta paquete
+Comprar paquete

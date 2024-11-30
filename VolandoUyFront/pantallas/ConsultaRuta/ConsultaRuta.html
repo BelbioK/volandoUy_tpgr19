@@ -1,0 +1,220 @@
+<div id="root-consulta-ruta">
+    <div id="info-section">
+        <info-card id="info-vuelo" data=''>
+            <div slot="subtitle" id="ciudades">
+            </div>
+            <div slot="additionalInfo" id="categorias"> 
+            </div>
+        </info-card>
+        <div id="cards">
+            <div class="mini-cards-superiores" >
+                <div class="mini-card">
+                    <span>Fecha</span>
+                    <h4 id="card-fecha">---</h4>
+                </div>
+                <div class="mini-card">
+                    <span>Hora</span>
+                    <h4 id="card-hora">---</h4>
+                </div>
+            </div>
+            <div class="mini-cards-inferiores">
+                <div class="mini-card">
+                    <span>Equipaje</span>
+                    <h4 id="card-cost-equi">---</h4>
+                </div>
+                <div class="mini-card">
+                    <span>Turista</span>
+                    <h4 id="card-cost-tur">---</h4>
+                </div>
+                <div class="mini-card">
+                    <span>Ejecutivo</span>
+                    <h4 id="card-cost-ejec">---</h4>
+                </div>
+            </div>
+        </div>
+        <div id="info-ciudades">
+            <div id="info-origen">
+                <h3 style="text-align: center;">Origen</h3>
+                <div id="nombre-origen"></div>
+                <div id="pais-origen"></div>
+                <div id="aeropuerto-origen"></div>
+                <div id="sitioWeb-origen"></div>
+            </div>
+            <div id="info-destino">
+                <h3 style="text-align: center;">Destino</h3>
+                <div id="nombre-destino"></div>
+                <div id="pais-destino"></div>
+                <div id="aeropuerto-destino"></div>
+                <div id="sitioWeb-destino"></div>
+            </div>
+        </div>
+        <div id="info-ciudades">
+            <div id="info-origen">
+                
+            </div>
+            <div id="info-destino">
+                
+            </div>
+        </div>
+    </div>
+    <div id="vuelosBar">
+        <div id="EstadoCuadrado">
+
+        </div>
+        <p style="margin-top: 1rem; font-size: 20px;">Utilizada por los vuelos:</p>
+        <resource-list id="vuelos-ruta">
+        </resource-list>
+    </div>
+</div>
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module" src="./componentes/base/resource-list/resource-list.js"></script>
+<script type="module">
+    import ControladorVuelos from './controladores/vuelos.js'
+    import {getUsuario} from "./utils/index.js"
+
+    try {
+        const params = JSON.parse(localStorage.getItem("params"))
+        const rutaNombre = params.ruta;
+        const getRuta = async ()=>{
+            const ruta = await ControladorVuelos.consultarRuta(rutaNombre);
+            const data = {title:ruta.aerolinea, image:`./assets/imagenes-precargadas/${ruta.imagen}`, content:ruta.descripcionCorta};
+            $('#info-vuelo').attr({data:JSON.stringify(data)});
+            $("#card-fecha").html(ruta.fechaAlta)
+            $("#card-hora").html(ruta.hora)
+            $("#descripcion-larga").html(ruta.descripcion)
+            $('#ciudades').html(`<span>${ruta.origen.nombre}--></span> <span>${ruta.destino.nombre}</span>`);
+            $('#seccion-vuelo-info').css("display","grid");
+            $("#cost-tur").html(ruta.descripcion)
+            $("#card-cost-equi").html(ruta.costoEquipaje)
+            $("#card-cost-tur").html(ruta.costoTurista)
+            $("#card-cost-ejec").html(ruta.costoEjecutivo)
+            $('#categorias').html(ruta.categorias.map(c => `<span>${c}</span>`).join(""));
+            
+            $("#nombre-origen").html(`<span> ${ruta.origen.nombre}</span>`)
+            $("#pais-origen").html(`<span> ${ruta.origen.pais}</span>`)
+            $("#aeropuerto-origen").html(`<span> ${ruta.origen.aeropuerto}</span>`)
+            $("#sitioWeb-origen").html(`<span> ${ruta.origen.sitioWeb}</span>`)
+            $("#nombre-destino").html(`<span> ${ruta.destino.nombre}</span>`)
+            $("#pais-destino").html(`<span> ${ruta.destino.pais}</span>`)
+            $("#aeropuerto-destino").html(`<span> ${ruta.destino.aeropuerto}</span>`)
+            $("#sitioWeb-destino").html(`<span> ${ruta.destino.sitioWeb}</span>`)
+            $("#EstadoCuadrado").html(`<div id="linda"> <span>${ruta.estado}</span></div>`)
+            if(ruta.estado=="confirmada"){$("#EstadoCuadrado").css("background-color", "green");} else if(ruta.estado=="pendiente"){$("#EstadoCuadrado").css("background-color", "yellow");} else{$("#EstadoCuadrado").css("background-color", "red");}
+            
+            const vuelosRuta = await ControladorVuelos.listarVuelosDeRuta(ruta.nombre)
+            $("#vuelos-ruta").attr("items",JSON.stringify(vuelosRuta.map(v => ({name:v.nombre+" ",key:v.nombre,image:"./assets/imagenes-precargadas/"+v.imagen}))))
+            $("#vuelos-ruta").attr("path","/consultaVuelo")
+            $("#vuelos-ruta").attr("paramkey","vuelo")
+        }
+        getRuta();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+
+<style>
+    #cola{
+        display: flex;
+        justify-content: space-between;
+    }
+    #cola2{
+        display: flex;
+    }
+    #root-consulta-ruta{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 4fr 2fr;
+        
+    }
+    #EstadoCuadrado{
+        padding: 1rem;
+        border-radius: 100px;
+
+    }
+    #info-section{
+        width: 100vh;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+        align-items: center;
+    }
+    #links-section{
+        padding: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    #cards{
+        display: grid; 
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: "superior"
+                            "inferior";
+    }
+    .mini-cards-superiores{
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        justify-items: center;
+        align-items: center; 
+        margin-bottom: 2rem;
+        grid-area: superior;
+    }
+    .mini-cards-inferiores{
+        grid-area: inferior;
+        margin-top: 0; 
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    #info-ciudades{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "origenGrid destinoGrid";
+    }
+    #info-origen{
+        grid-area: origenGrid;
+        justify-self: center;
+        align-items: center;
+    }
+    #info-destino{
+        grid-area: destinoGrid;
+        justify-self:center;
+    }
+    #categorias span{
+        margin-right: 5px;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+    #nombre-origen, #pais-origen, #aeropuerto-origen, #sitioWeb-origen, #nombre-destino, #pais-destino, #aeropuerto-destino, #sitioWeb-destino{
+        text-align: center;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+        margin: 1%;
+    }
+</style>

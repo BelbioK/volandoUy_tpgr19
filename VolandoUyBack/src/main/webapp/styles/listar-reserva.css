@@ -1,0 +1,32 @@
+ #root-listar-paquetes{
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+ }
+ .row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-categorias span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+    .tipoAsiento{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+        margin-right: 1rem;
+    }
+    .fecha{
+        background-color: rgb(207, 146, 226);
+    }
+    .ejecutivo{
+        background-color: rgb(226, 146, 213);
+    }
+    .turista{
+        background-color: rgb(146, 194, 226);
+    }

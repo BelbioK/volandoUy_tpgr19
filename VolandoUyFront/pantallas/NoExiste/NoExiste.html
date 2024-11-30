@@ -1,0 +1,74 @@
+<head>
+    <title>Página no encontrada</title>
+</head>
+<body>
+    <div id="error-container">
+        <h1>404</h1>
+        <h2>Página no encontrada</h2>
+        <p>Lo sentimos, la página que estás buscando no existe o ha sido movida.</p>
+        <a class="back-home" href="/">Volver al inicio</a>
+    </div>
+</body>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    #error-container {
+        text-align: center;
+        max-width: 600px;
+    }
+
+    h1 {
+        font-size: 8rem;
+        margin: 0;
+        font-weight: 700;
+        line-height: 1;
+        color: rgba(255, 255, 255, 0.8);
+        text-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        font-size: 2rem;
+        font-weight: 400;
+        margin-bottom: 20px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .back-home {
+        text-decoration: none;
+        font-size: 1.1rem;
+        padding: 15px 30px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 30px;
+        color: white;
+        font-weight: bold;
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    }
+
+    .back-home:hover {
+        background-color: white;
+        color: #764ba2;
+        transform: scale(1.05);
+    }
+
+    .illustration {
+        max-width: 200px;
+        margin: 30px auto;
+    }
+</style>

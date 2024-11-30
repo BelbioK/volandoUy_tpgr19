@@ -1,0 +1,111 @@
+ #root-comprar-paquete{
+        display: flex;
+        flex-direction: column;
+        width: 80%;
+        margin:auto;
+        height: 100%;
+        padding: 2rem;
+        position: relative;
+    }
+    #root-comprar-paquete button{
+        margin-top:auto;
+        border: none; 
+        padding: 5px; 
+        background-color: var(--purple-primary); 
+        border-radius: 2rem;
+        color:white; font-size: 1.2rem; 
+        transition: all 0.3s;
+        width: 100%;
+    }
+    #btn-comprar:disabled {
+		background-color: gray;
+        opacity: 0,9;
+        cursor: not-allowed;
+    }
+    #root-comprar-paquete button:not(:disabled):hover{
+        opacity: 1;
+    }
+    .selected{
+        background-color: var(--purple-primary);
+    }
+    #lista-paquetes{
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+    #btn-comprar {
+    position: fixed; 
+    bottom: 20px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 400px; 
+    background-color: var(--purple-primary); 
+    border: none; 
+    border-radius: 2rem;
+    color: white; 
+    font-size: 1.5rem; 
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.card{
+border-radius: 10px;
+padding: 10px;
+min-height: 150px;
+width: 100%;
+display: grid;
+grid-template-columns: 1fr 4fr;
+grid-template-rows: 1fr 1fr 1fr 1fr;
+grid-template-areas:'image title' 
+                    'image subtitle'
+                    'image content'
+                    'image additionalInfo';
+transition: all 0.3s;
+}
+.card:not(.selected):hover{
+    background-color: #f4f4f9;
+}
+.card.selected:hover{
+    opacity: 0.8;
+}
+.card-image{
+    padding: 5px;
+    grid-area: image;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+.card-image img{
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+.card-title{
+    grid-area: title;
+
+}
+.card-subtitle{
+    grid-area: subtitle;
+
+}
+.card-content{
+    grid-area: content;
+}
+.card-additionalInfo{
+    grid-area: additionalInfo;
+    height: 100%;
+    width: 100%;
+}
+.row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-categorias span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }

@@ -1,0 +1,510 @@
+<div id="root-reservar-vuelo">
+    <div class="seccion-selects-info">
+        <div class="label-select">
+            <label>Aerolinea</label>
+            <select id="select-aerolinea">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="label-select">
+            <label>Ruta de vuelo</label>
+            <select id="select-ruta">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="label-select">
+            <label>Vuelo</label>
+            <select id="select-vuelo">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="info" id="seccion-vuelo-info"  style="display: none;">
+            <div>
+                <span>Información general</span>
+            </div>
+            <info-card id="info-vuelo" data=''>
+                <div slot="subtitle" id="ciudades">
+                </div>
+                <div slot="additionalInfo" id="categorias"> 
+                </div>
+            </info-card>
+            <div>
+                <span>Fecha</span>
+            </div>
+            <div style="display: grid;grid-template-columns: 1fr 1fr; justify-items: center;align-items: center; margin:1rem 0 1rem 0;">
+                <div class="mini-card">
+                    <span>Fecha</span>
+                    <h4 id="card-fecha">08-09-2024</h4>
+                </div>
+                <div class="mini-card">
+                    <span>Hora</span>
+                    <h4 id="card-hora">10:32</h4>
+                </div>
+            </div>
+            <div>
+                <span>Costos</span>
+            </div>
+            <div style="display: grid;grid-template-columns: 1fr 1fr 1fr;justify-items: center;align-items: center;">
+                <div class="mini-card">
+                    <span>Equipaje</span>
+                    <h4 id="card-costo-equipaje">100</h4>
+                </div>
+                <div class="mini-card">
+                    <span>Turista</span>
+                    <h4 id="card-costo-turista">100</h4>
+                </div>
+                <div class="mini-card">
+                    <span>Ejecutivo</span>
+                    <h4 id="card-costo-ejecutivo">100</h4>
+                </div>
+            </div> 
+        </div>
+    </div>
+    <div class="seccion-form-reserva">
+        <div style="display: grid; grid-template-columns: 4fr 1fr; justify-content: left; height: 66px;">
+            <div class="label-select">
+                <label>Asiento</label>
+                <select id="select-asiento">
+                    <option value="turista">Turista</option>
+                    <option value="ejecutivo">Ejecutivo</option>
+                </select>
+            </div>
+            <div class="label-input" style="width: 90%;">
+                <label>Equipaje extra</label>
+                <input type="number" id="input-equipaje" name="quantity" min="1" max="1000" value="1" step="1">
+            </div>
+        </div>
+        <div style="margin-top: 1rem;">
+            <label >
+                Pasajes
+            </label>
+        </div>
+        
+        <div id="form-pasajes" class="form-pasajes">
+            <div class="pasajes-row">
+                <span>Nombre</span>
+                <span>Apellido</span>
+            </div>
+            <div class="pasajes-row">
+                <input disabled id="nombreCliente"/>
+                <input disabled id="apellidoCliente"/>
+            </div>
+            
+            <div class="add-row">
+                <button id="agregarPasaje" class="icon-btn add">+</button>
+            </div>
+        </div>
+        <div class="tipo-pago" id="seccion-tipo-pago" style="display: none;">
+            <label>Tipo de pago</label>
+            <br/>
+            <input id="general-radio" type="radio" name="tipoPago" value="general" checked="checked">
+            <label for="general-radio">General</label>
+            <br/>
+            <input id="paquete-radio" type="radio" name="tipoPago" value="paquete">
+            <label for="paquete-radio">Con paquete</label>
+            <br/>
+            <div class="paquetes-aplicables">
+                
+            </div>
+        </div>
+        <div style="display: grid; align-items: center; justify-items: center; margin-top: auto;"> 
+            <div>Costo: <span id="costo-total">0</span></div>
+            <button id="confirmar" class="boton-facha">Confirmar</button>
+        </div>
+    </div>
+    <error-popup id="errorAlta" ></error-popup>
+    <success-popup id="gracias-por-reserva" hide="true" titulo="La transacción ha sido realizada con éxito" subtitulo="Gracias por su reserva :D"></success-popup>
+</div>
+
+<script type="module" src="../../componentes/base/card/card.js"></script>
+<script type="module" src="../../componentes/base/success-popup/success-popup.js"></script>
+<script type="module">
+    import {getUsuario} from "../../utils/index.js"
+    import ControladorVuelo from "../../controladores/vuelos.js";
+    import ControladorUsuario from "../../controladores/usuarios.js";
+    import ControladorPaquete from "../../controladores/paquetes.js";
+
+    var totalPasajes = 0;
+    var aerolineas = [];
+    var rutasPorAerolinea = {};
+    var vuelosPorRuta = {};
+
+    const params = JSON.parse(localStorage.getItem("params"))
+    const selectedAerolinea = params?.aerolinea || "";
+    const selectedRuta = params?.ruta || "";
+    const selectedVuelo = params?.vuelo || "";
+
+    const {nombre, apellido, nickname} = getUsuario();
+    $("#nombreCliente").val(nombre)
+    $("#apellidoCliente").val(apellido)
+
+    const cargarAerolineas = async () =>{
+        aerolineas = await ControladorUsuario.listarAerolineas();
+        aerolineas.forEach(aerolinea => 
+            $('#select-aerolinea').append(`<option value="${aerolinea.nickname}">${aerolinea.nombre}</option>`)
+        );
+    }
+    const updateMiniCardValue = (cardId,value) =>{
+        $(`#${cardId}`).last().html(value);
+    }
+    const recalcularCosto = ()=>{
+        const rutaNombre = $('#select-ruta').val();
+        const ruta = rutasPorAerolinea[$('#select-aerolinea').val()]?.find(v => v.nombre == rutaNombre) || null;
+        if(!ruta){
+            $("#costo-total").html("0$")
+            return;
+        }
+
+        const equipajeExtra = $('#input-equipaje').val();
+        const costoPasaje = $('#select-asiento').val() == 'turista' ? ruta.costoTurista : ruta.costoEjecutivo;
+        const pasajes = $('.pasajes-row.custom').length+1;
+        const descuento = $(".paquete-aplicable.selected").length ? paquetes[$(".paquete-aplicable.selected").get(0).id.replace("paquete-aplicable-","")]?.descuento || 0 : 0; 
+    
+        let costo = costoPasaje*pasajes + equipajeExtra*ruta.costoEquipaje;
+        costo = costo*(100-descuento)/100;
+
+        $("#costo-total").html(costo+"$")
+
+    }
+    $('#select-aerolinea').change(async function(){
+        const aero = $(this).val();
+        $('#seccion-vuelo-info,#seccion-tipo-pago').css("display","none");
+        if(!aero){
+            $('#select-ruta').empty();
+            $('#select-vuelo').empty();
+            return;
+        }
+        if(!rutasPorAerolinea[aero])
+            rutasPorAerolinea[aero] = await ControladorVuelo.listarRutasDeAerolinea(aero);
+        console.log(rutasPorAerolinea[aero])
+        $('#select-ruta').empty();
+        $('#select-vuelo').empty();
+        $('#select-ruta').append(`<option value=""></option>`)
+        rutasPorAerolinea[aero].forEach(ruta => 
+            $('#select-ruta').append(`<option value="${ruta.nombre}">${ruta.nombre}</option>`)
+        )
+        recalcularCosto();
+    })
+
+    $('#select-ruta').change(async function(){
+        const ruta = $(this).val();
+        $('#seccion-vuelo-info,#seccion-tipo-pago').css("display","none");
+        if(!ruta){
+            $('#select-vuelo').empty();
+            return;
+        }
+        if(!vuelosPorRuta[ruta])
+        vuelosPorRuta[ruta] = await ControladorVuelo.listarVuelosDeRuta(ruta);
+        $('#select-vuelo').empty();
+        $('#select-vuelo').append(`<option value=""></option>`)
+        vuelosPorRuta[ruta].forEach(vuelo => 
+            $('#select-vuelo').append(`<option value="${vuelo.nombre}">${vuelo.nombre}</option>`)
+        )
+        recalcularCosto();
+    })
+
+    $('#select-vuelo').change(async function(){
+        const vueloNombre = $(this).val();
+        const rutaNombre = $('#select-ruta').val();
+        const ruta = rutasPorAerolinea[$('#select-aerolinea').val()]?.find(v => v.nombre == rutaNombre) || null;
+        const vuelo = vuelosPorRuta[rutaNombre]?.find(v => v.nombre == vueloNombre) || null;
+        console.log(vuelo)
+        if(!vuelo || !ruta){
+            $('#seccion-vuelo-info,#seccion-tipo-pago').css("display","none");
+            return;
+        }
+
+        const data = {title:vuelo.nombre, image:"./assets/imagenes-precargadas/"+vuelo.imagen, content:ruta.descripcion};
+        $('#info-vuelo').attr({data:JSON.stringify(data)});
+        $('#ciudades').html(`<span>${ruta.origen.nombre}</span> -> <span>${ruta.destino.nombre}</span>`);
+        $('#categorias').html(ruta.categorias.map(c => `<span>${c}</span>`).join(""));
+        $('#seccion-vuelo-info').css("display","grid");
+        $('#seccion-tipo-pago').css("display","");
+        $(`#card-fecha`).html(vuelo.fecha)
+        $(`#card-hora`).html(ruta.hora)
+        $(`#card-costo-equipaje`).html(ruta.costoEquipaje)
+        $(`#card-costo-turista`).html(ruta.costoTurista)
+        $(`#card-costo-ejecutivo`).html(ruta.costoEjecutivo)
+        recalcularCosto();
+    })
+
+    $("#agregarPasaje").click(()=> {
+        $('#form-pasajes div:last').before(`
+            <div class="pasajes-row custom" id="row_${totalPasajes}">
+                <input id='nombre-pasaje-${totalPasajes}'/>
+                <input id='apellido-pasaje-${totalPasajes}'/>
+                <button id="borrarPasaje_${totalPasajes}" class="icon-btn cross">x</button>
+            </div>
+        `);
+        let index = totalPasajes
+        $(`#borrarPasaje_${totalPasajes}`).click(()=>{
+            $(`#row_${index}`).remove();
+        })
+        totalPasajes++;
+        recalcularCosto();
+    })
+
+    $('#general-radio').change(async function() {
+        $('.paquetes-aplicables').html("");
+        recalcularCosto();
+    })
+
+    var paquetes = [];
+    $("#paquete-radio").change(async function (){
+        const reserva = {
+            aerolinea:$('#select-aerolinea').val(),
+            ruta:$('#select-ruta').val(),
+            vuelo:$('#select-vuelo').val(),
+            asiento:$('#select-asiento').val(),
+            equipaje:$('#input-equipaje').val(),
+            pasajes:$('.pasajes-row').length-1, //NO BORRAR -1
+        }
+        paquetes = await ControladorPaquete.listarPaquetesAplicables(reserva);
+        const seccionPaquetes = paquetes.map((p,i) => `
+            <div id='paquete-aplicable-${i}' class="paquete-aplicable">
+                <img src="./assets/imagenes-precargadas/${p.imagen}">
+                <span>${p.nombre}, ${p.cantidadRestante} pasajes</span>
+            </div>
+        `).join('');
+        $('.paquetes-aplicables').html(seccionPaquetes);
+        paquetes.forEach((p,i)=>{
+            $('#paquete-aplicable-'+i).click(function(){
+                $(this).toggleClass("selected");
+                paquetes.forEach((p2,j) => j!=i ? $('#paquete-aplicable-'+j).removeClass("selected"):'')
+                recalcularCosto();
+            });
+        })
+        recalcularCosto();
+    })
+
+    const validateField = (field) =>{
+        try {   
+            if($("#"+field.id).val() && (!field.validate || field.validate($("#"+field.id).val()))){
+                $("#"+field.id).removeClass('invalid-value')
+                return true;
+            }
+            
+            $("#"+field.id).addClass('invalid-value')
+        } catch (e) {
+            console.error(e)
+        }
+        return false;
+    };
+    $('#select-asiento').change(()=> recalcularCosto());
+    $('#input-equipaje').change(()=> recalcularCosto());
+    $("#confirmar").click(async()=>{
+        const fields = [{id:'select-aerolinea', message:"Debe seleccionar una aerolinea"},
+                        {id:'select-ruta', message:"Debe seleccionar una ruta de vuelo"},
+                        {id:'select-vuelo', message:"Debe seleccionar un vuelo"},
+                        {id:'select-asiento', message:"Debe seleccionar un tipo de asiento"},
+                        {id:'input-equipaje', validate:(value) => Number.isInteger(Number.parseInt(value)) && value>=0, message:"El número de equipaje extra debe ser un número positivo"}
+                    ]
+        var pasajes = [];
+        $('.pasajes-row.custom').each(function(){
+            const nombrePasajeField = $(this).children()[0];
+            const apellidoPasajeField = $(this).children()[1];
+            pasajes.push({nombre:nombrePasajeField.value, apellido:apellidoPasajeField.value});
+            fields.push({id:nombrePasajeField.id, message:"El nombre de todos los pasajeros es obligatorio"});
+            fields.push({id:apellidoPasajeField.id, message:"El apellido de todos los pasajeros es obligatorio"});
+        });
+
+        if($('input[name=tipoPago]:checked').val() == 'paquete'){
+            console.log('select')
+            fields.push({id:'paquete-radio', validate:() => $(".paquete-aplicable.selected").length > 0, message:"Debe seleccionar qué paquete aplicar"});
+        }
+        let valid = true;
+        fields.forEach(f => {
+            const oldValid = valid;
+            valid &= validateField(f)
+            if(oldValid && !valid)
+                $('#errorAlta').attr('message',f.message)
+        });
+        if(!valid)
+            return;
+        const reserva = {
+            aerolinea:$('#select-aerolinea').val(),
+            ruta:$('#select-ruta').val(),
+            vuelo:$('#select-vuelo').val(),
+            asiento:$('#select-asiento').val(),
+            equipaje:$('#input-equipaje').val(),
+            pasajes:pasajes,
+        }
+        
+        await ControladorVuelo.altaReserva(nickname,reserva);
+
+        $("#gracias-por-reserva").attr("hide","false");
+        
+        console.log(reserva)
+    });
+
+    cargarAerolineas();
+
+    if(selectedAerolinea)
+            $('#select-aerolinea').val(selectedAerolinea);
+</script>
+
+<style>
+    #root-reservar-vuelo{
+        height: 100%;
+        width: 100%;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .seccion-selects-info{
+        height: 100%;
+        width: 100%;
+    }
+    .seccion-form-reserva{
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        max-height: 100%;
+        width: 100%;
+    }
+    .seccion-selects-info .label-select{
+        width: 80%;
+    }
+    .info{
+        padding-top: 1rem;
+        margin: auto;
+        justify-self: center;
+        width: 80%;
+    }
+    .label-select, .label-input{
+        margin: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .label-select + .label-select{
+        margin-top: 2rem;
+    }
+    
+    .form-pasajes{
+        width: 100%;
+        height: 250px;
+        max-height: 250px;
+        overflow-y: scroll;
+    }
+    .tipo-pago{
+        height: calc(100vh - 550px);
+    }
+    .tipo-pago input{
+        margin-top: 2rem;
+    }
+    .pasajes-row{
+        width: 100%;
+        display: grid;
+        grid-template-columns: 5fr 5fr 1fr;
+        align-items: center;
+        justify-items: center;
+        text-align: center;
+        gap: 1rem;
+    }
+    .pasajes-row input{
+        width: 100%;
+    }
+    .pasajes-row + .pasajes-row{
+        margin-top: 1rem;
+    }
+    .icon-btn {
+        width: 2rem;
+        height: 2rem;
+        background: none;
+        border: none;
+        border-radius: 10px;
+        font-size: 2rem;
+        text-align: center;
+        line-height: 2rem;
+        transition: all 0.3s;
+    }
+    .icon-btn:hover{
+        font-size: 2.5rem;
+    }
+    .cross{
+        color: rgb(255, 77, 77);
+    }
+    .add{
+        color: var(--purple-primary);
+    }
+    .add-row{
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 10fr 1fr;
+        justify-items: center;
+        align-items: center;
+    }
+    #categorias span{
+        margin-right: 5px;
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+    .boton-facha{
+        border: none; 
+        padding: 10px; 
+        background-color: var(--purple-primary); 
+        border-radius: 10px; margin: auto; 
+        color:white; font-size: 1.2rem; 
+        width: 120px;
+    }
+    .mini-cards-section{
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    .invalid-value{
+        border: rgb(247, 95, 95) solid 2px;
+    }
+    .paquetes-aplicables{
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .paquete-aplicable{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: auto;
+        width: 70%;
+        height: 4rem;
+        border-radius: 2rem;
+    }
+    .paquete-aplicable:hover{
+        background-color: var(--purple-light);
+    }
+    .paquete-aplicable.selected{
+        background-color: var(--purple-primary);
+    }
+    .paquete-aplicable img{
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    .paquete-aplicable span{
+        width: calc(100% - 10rem);
+    }
+
+    input[name=tipoPago].invalid-value ~ label{
+        color:  rgb(247, 95, 95);
+    }
+</style>

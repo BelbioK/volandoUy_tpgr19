@@ -1,0 +1,162 @@
+<div id="root-comprar-paquete">
+    <div id="lista-paquetes">
+    </div>
+    <button id="btn-comprar" disabled>Comprar paquete</button>
+    <success-popup id="gracias-por-compra" hide="true" titulo="La transacción ha sido realizada con éxito" subtitulo="Gracias por su compra :D"></success-popup>
+</div>
+
+
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module">
+    import ControladorPaquete from './controladores/paquetes.js'
+    import {navigate} from "./utils/index.js"
+    try {
+        const filtros = JSON.parse(localStorage.getItem("filtros")) || {};
+        var paquetes = [];
+        const listarPaquetes = async ()=>{
+            paquetes = await ControladorPaquete.listarPaquetes();
+            // for(let i = 0; i<6;i++) //Para probar con m[as paquetes
+            //     paquetes.push((await ControladorPaquete.listarPaquetes())[0] )
+            paquetes = paquetes.filter(p => (!filtros.busqueda || p.nombre.includes(filtros.busqueda))
+                                            && (!filtros.ruta || p.rutas.find(r => r.nombre == filtros.ruta)))
+                                            
+            $('#lista-paquetes').html(paquetes.map((p,i) => `
+                                                                <div id="card-${i}" class="card">
+                                                                    <div class="card-image">
+                                                                        <img src="./assets/imagenes-precargadas/${p.imagen}"/>
+                                                                    </div>
+                                                                    <div class="card-title">${p.nombre}</div>
+                                                                    <div class="card-subtitle">${p.descuento}% de descuento</div>
+                                                                    <div class="card-content">
+                                                                        ${p.descripcion}
+                                                                    </div>
+                                                                    <div class="card-additionalInfo">
+                                                                        <div class="row-categorias">
+                                                                            ${p.rutas.map(r => `<span>${r.nombre}, trae ${r.cantidad} pasajes</span>`).join('')}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            `).join(''));
+
+            paquetes.forEach((p,i) =>{
+                $(`#card-${i}`).click(function(){
+                    $(this).toggleClass("selected")
+                    paquetes.forEach((p2,j) => j!=i ? $('#card-'+j).removeClass("selected"):'')
+                    if($(this).hasClass("selected"))
+                        $("#btn-comprar").attr("disabled",false)
+                    else
+                        $("#btn-comprar").attr("disabled",true)
+                })
+            });
+
+            $("#btn-comprar").click(async ()=>{
+                const paqueteIndex = $('.selected').attr("id").replace("card-","");
+                const paqueteAComprar = paquetes[paqueteIndex];
+                await ControladorPaquete.comprarPaquete(paqueteAComprar);
+                $("#gracias-por-compra").attr("hide","false");
+                paquetes.forEach((p2,j) => $('#card-'+j).removeClass("selected"))
+                $("#btn-comprar").attr("disabled",true)
+            })
+        }
+        listarPaquetes();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+<style>
+    #root-comprar-paquete{
+        display: flex;
+        flex-direction: column;
+        width: 80%;
+        margin:auto;
+        height: 100%;
+        padding: 2rem;
+        position: relative;
+    }
+    #root-comprar-paquete button{
+        margin-top:auto;
+        border: none; 
+        padding: 5px; 
+        background-color: var(--purple-primary); 
+        border-radius: 2rem;
+        color:white; font-size: 1.2rem; 
+        transition: all 0.3s;
+        width: 100%;
+    }
+    #root-comprar-paquete button:disabled{
+        opacity: 0.4;
+    }
+    #root-comprar-paquete button:not(:disabled):hover{
+        opacity: 0.8;
+    }
+    .selected{
+        background-color: var(--purple-primary);
+    }
+    #lista-paquetes{
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+.card{
+border-radius: 10px;
+padding: 10px;
+min-height: 150px;
+width: 100%;
+display: grid;
+grid-template-columns: 1fr 4fr;
+grid-template-rows: 1fr 1fr 1fr 1fr;
+grid-template-areas:'image title' 
+                    'image subtitle'
+                    'image content'
+                    'image additionalInfo';
+transition: all 0.3s;
+}
+.card:not(.selected):hover{
+    background-color: #f4f4f9;
+}
+.card.selected:hover{
+    opacity: 0.8;
+}
+.card-image{
+    padding: 5px;
+    grid-area: image;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+.card-image img{
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+.card-title{
+    grid-area: title;
+
+}
+.card-subtitle{
+    grid-area: subtitle;
+
+}
+.card-content{
+    grid-area: content;
+}
+.card-additionalInfo{
+    grid-area: additionalInfo;
+    height: 100%;
+    width: 100%;
+}
+.row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-categorias span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+</style>

@@ -1,0 +1,93 @@
+ #root-consulta-paquete{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 4fr 2fr;
+    }
+
+    #info-section{
+        width: 100%;
+        display: grid;
+        grid-template-rows: 2fr 3fr;
+        align-items: center;
+    }
+    #links-section{
+        padding: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    .mini-cards-paquete{
+        margin-top: -5rem;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    
+    .resource-list{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--purple-primary);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+.resource-item:hover {
+    background-color: #eaeaea;
+}
+
+.resource-image{
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.resource-list-button {
+    background-color: var(--purple-primary);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.resource-list-button:hover {
+    background-color: #0056b3;
+}

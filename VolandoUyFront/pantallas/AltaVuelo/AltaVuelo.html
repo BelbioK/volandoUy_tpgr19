@@ -1,0 +1,237 @@
+<div id="root-alta-vuelo">
+    <!-- <h1>Dar de Alta un Nuevo Vuelo</h1> -->
+    <div class="label-select">
+        <form id = 'formAltaVuelo' onsubmit="event.preventDefault()">
+            <div class="label-select">
+                <label>Ruta del vuelo:</label>
+                <select id="selectRutaVuelo" name="rutaVuelo" >
+                    <option value="" disabled selected>Seleccione una ruta</option>
+                </select><br><br>
+            </div>
+
+            <div class="label-select">
+                <label for="nombreVuelo">Nombre del vuelo (único):</label>
+                <input type="text" id="nombreVuelo" name="nombreVuelo" ><br><br>
+            </div>
+            
+            <div class="label-select">
+                <label for="fechaVuelo">Fecha del vuelo:</label>
+                <input type="date" id="fechaVuelo" name="fechaVuelo" ><br><br>
+            </div>
+                     
+            <div class="label-select">
+                <label for="asientosEjecutivos">Cantidad máxima de asientos ejecutivos:</label>
+                <input type="number" id="asientosEjecutivos" name="asientosEjecutivos" min="0" ><br><br>
+            </div>
+            
+            <div class="label-select">
+                <label for="asientosTurista">Cantidad máxima de asientos turistas:</label>
+                <input type="number" id="asientosTurista" name="asientosTurista" min="0" ><br><br>
+            </div>
+            
+            <div class="label-select">
+                <label for="fotoVuelo">Subir foto del vuelo (opcional):</label>
+                <input type="file" style="height: 35px; padding: 8px;" id="fotoVuelo" name="fotoVuelo" accept="image/*"><br><br>
+            </div>
+            <div class="full-width" style="height: 1rem;">
+                <label>Duración del vuelo:</label><br>
+            </div>
+            <div class="label-select">
+                <label>Horas:</label>
+                <input type="number" id="duracionHoras" name="duracionVueloHoras" min="0" ><br><br>
+            </div>
+            <div class="label-select">
+                <label>Minutos:</label>
+                <input type="number" id="duracionMinutos" name="duracionVueloMinutos" min="0" max="59" ><br><br>
+            </div>
+            <div class="full-width" style="display: grid; align-items: center; justify-items: center;">
+                <button id="Registrar" class="boton">Registrar Vuelo</button>
+            </div>
+            <div id="full-info">    
+                
+            </div>
+            <error-popup id="mensaje-error" ></error-popup>
+            <success-popup id="vuelo-nuevo" hide="true" titulo="Su vuelo se ha creado correctamente" subtitulo=":D"></success-popup>
+        </form>
+    </div>
+</div>
+
+<!--Preguntar sobre como manejar las cosas de las fotos-->
+
+<script type="module" src="../../componentes/base/success-popup/success-popup.js"></script>
+<script type="module">
+    import {getUsuario} from "./utils/index.js"
+    import ControladorVuelo from "./controladores/vuelos.js";
+
+    var rutasAero = {};
+    
+    const params = JSON.parse(localStorage.getItem("params"))
+    const selectedRuta = params?.ruta || "";
+
+    const {nombre, apellido, nickname} = getUsuario();
+
+    const cargarRutaAero = async () =>{
+        console.log('Aerolinea obtenida:', nickname); 
+        if (!rutasAero[nickname]) {
+            rutasAero[nickname] = await ControladorVuelo.listarRutasDeAerolinea(nickname);
+            console.log(rutasAero[nickname]);
+        }
+        rutasAero[nickname].forEach(ruts => 
+            $('#selectRutaVuelo').append(`<option value="${ruts.nombre}">${ruts.nombre}</option>`)
+        );
+    }
+
+    const validarAsientos = () => {
+        const cantTuri = Number ($('#asientosTurista').val());
+        const cantEje = Number ($('#asientosEjecutivos').val());
+        return !(cantEje === 0 && cantTuri === 0);
+    }
+    
+    const validarDuracion = () => {
+        const durHoras = Number($('#duracionHoras').val());
+        const durMinutos = Number ($('#duracionMinutos').val());
+        return !(durHoras === 0 && durMinutos === 0);
+    }
+
+    const obtenerFechaActual = () => {
+        const hoy = new Date(); 
+        const dia = String(hoy.getDate()).padStart(2, '0');  
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0'); 
+        const anio = hoy.getFullYear(); 
+        return `${dia}/${mes}/${anio}`;
+    };
+
+    const verificardatos = (abierto=false) => {
+
+        let nombreVue = $('#nombreVuelo').val()
+        let ruta = $('#selectRutaVuelo').val()
+        let fechaVue = $('#fechaVuelo').val()
+        let cantTuri = $('#asientosTurista').val()
+        let cantEje = $('#asientosEjecutivos').val()
+        let durHoras = $('#duracionHoras').val()
+        let durMinutos = $('#duracionMinutos').val()
+        if(!nombreVue) {
+            $('#mensaje-error').attr('message',"Falta ingresar nombre del vuelo")
+            return false
+        }
+        if(!ruta) {
+            $('#mensaje-error').attr('message',"Falta ingresar ruta")
+            return false
+        }
+        if(!fechaVue){
+            $('#mensaje-error').attr('message',"Falta ingresar fecha")
+            return false
+        }
+        if(!cantTuri){
+            $('#mensaje-error').attr('message',"Falta ingresar cantidad de Turistas")
+            return false
+        }
+        if(!cantEje){
+            $('#mensaje-error').attr('message',"Falta ingresar cantidad de Ejecutivos")
+            return false
+        }
+        if(!durHoras){
+            $('#mensaje-error').attr('message',"Falta ingresar la horas de la duracion del vuelo")
+            return false
+        }
+        if(!durMinutos){
+            $('#mensaje-error').attr('message',"Falta ingresar los minutos de la duracion del vuelo")
+            return false
+        }
+        if(!abierto) $("#full-info").html("")
+        return true
+    };
+    
+    $("#Registrar").click(async()=>{
+        const  valiDatos = verificardatos();
+        if(!valiDatos)
+            return;
+        let valid = true
+
+        if(!validarAsientos()){
+            $('#mensaje-error').attr('message',"La cantidad de asientos del vuelo, debe ser mayor a 0")
+            return valid = false
+        }
+
+        if(!validarDuracion()){
+            $('#mensaje-error').attr('message',"La duracion debe ser una mayor a 0")
+            return valid = false
+        }
+
+        if(!valid){
+            return;
+        }
+
+        const vuelo = {
+            nombreVue:$('#nombreVuelo').val(),
+            ruta:$('#selectRutaVuelo').val(),
+            fechaVue:$('#fechaVuelo').val(),
+            fechaAlta: obtenerFechaActual(),
+            cantTuri:$('#asientosTurista').val(),
+            cantEje:$('#asientosEjecutivos').val(),
+            durHoras:$('#duracionHoras').val(),
+            durMinutos:$('#duracionMinutos').val(),
+        }
+        
+        await ControladorVuelo.altaVuelo(nickname, vuelo);
+        $("#vuelo-nuevo").attr("hide","false");
+        console.log('el vuelo recien creado por', nickname, 'es', vuelo);
+        $('#formAltaVuelo')[0].reset();
+    });
+
+    cargarRutaAero();
+
+</script>
+
+<style>
+    #root-alta-vuelo{
+        padding: 2rem;
+    }
+    h1 {
+        text-align: center;
+    }
+    form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input, textarea, select {
+        width: 100%;
+        padding: 10px;
+    }
+    textarea {
+        resize: vertical;
+    }
+    .full-width {
+        grid-column: 1 / 3;
+    }
+    .submit-btn {
+        grid-column: 1 / 3;
+        text-align: center;
+    }
+    .boton {
+        background-color: var(--purple-primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+    }
+    .invalid-value{
+        border: rgb(247, 95, 95) solid 2px;
+    }
+    
+</style>
+
+

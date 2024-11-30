@@ -1,0 +1,50 @@
+<div id="root-listar-paquetes">
+
+</div>
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module">
+    import ControladorPaquete from './controladores/paquetes.js'
+    import {navigate} from "./utils/index.js"
+    try {
+        const filtros = JSON.parse(localStorage.getItem("filtros")) || {};
+        
+        const listarPaquetes = async ()=>{
+            let paquetes = await ControladorPaquete.listarPaquetes();
+            paquetes = paquetes.filter(p => (!filtros.busqueda || p.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()))
+                                            && (!filtros.ruta || p.rutas.find(r => r.nombre == filtros.ruta)))
+            $('#root-listar-paquetes').html(paquetes.map((p,i) => `<info-card id='card-${i}' data='${JSON.stringify({image:`./assets/imagenes-precargadas/${p.imagen}`,title:p.nombre,content:p.descripcion})}'>
+                                                                    <slot slot="additionalInfo" class="row-categorias">
+                                                                        ${p.rutas.map(r => `<span>${r.nombre}</span>`).join('')}
+                                                                    </slot>
+                                                                </info-card>`).join(''));
+
+            paquetes.forEach((p,i) =>{
+                $(`#card-${i}`).click(()=>{
+                    console.log("p")
+                    navigate("/consultaPaquete",{paquete:p.nombre})
+                })
+            });
+        }
+        listarPaquetes();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+<style>
+ #root-listar-paquetes{
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+ }
+ .row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-categorias span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+</style>

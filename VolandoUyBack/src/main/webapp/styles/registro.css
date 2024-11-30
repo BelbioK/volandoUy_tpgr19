@@ -1,0 +1,78 @@
+#registro-root{
+  padding: 2rem;
+}
+.registro-form {
+  font-family: Arial, sans-serif;
+  display: grid;
+  gap: 20px;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.registro-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+#aceptar{
+  height:70%;
+  background-color: var(--purple-primary);
+  margin-top:auto;
+  transition: all 0.3s;
+}
+#aceptar:hover{
+  background-color: var(--purple-hover);
+}
+.registro-form button {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--purple-primary);
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  cursor: pointer;
+  font-size: large;
+  margin-right: 10px;
+  margin-top: 8px;
+  transition: all 0.3s;
+}
+.registro-form button:hover {
+  background-color: var(--purple-hover);
+}
+
+input,textarea, select {
+  width: 100%;
+  margin-top: 8px;
+}
+.error{
+  color: red;
+  font-size: smaller;
+  text-align: center;
+}
+#registrar{
+  font-size: smaller;
+  text-align: center;
+}
+#botones-tipo-usuario{
+  display: flex;
+}
+#datos-usuario{
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+.input-text {
+  display: block;
+  margin-top: 18px;
+}
+.coso-coso{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.inputs-form{
+  margin-right: 10px;
+}
+#side-bar-aplicar-filtros{
+	display: none;
+}

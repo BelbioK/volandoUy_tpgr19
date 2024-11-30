@@ -1,0 +1,234 @@
+<div id="root-consulta-vuelo">
+    <div id="info-section">
+        <div class="imagen-nombre-desc">
+            <img id="imagen-vuelo">
+            <div>
+                <div>
+                    <h2 class="name" id="nombre-vuelo"></h2>
+                    <span class="desc" id="desc-vuelo"></span>
+                </div>
+                <div class="info-asientos-vuelo">
+                    <div class="mini-card" style="margin-right: 10px;">
+                        <span>Asientos Turista</span>
+                        <h4 id="info-asientos-turista"></h4>
+                    </div>
+                    <div class="mini-card">
+                        <span>Asientos Ejecutivo</span>
+                        <h4 id="info-asientos-ejecutivo"></h4>
+                    </div>
+                </div>
+            </div>
+            <div id="links-section">
+                <p style="margin-top: 1rem; font-size: 20px;">Aerolínea</p>
+                <resource-list id="aerolinea">
+                </resource-list>
+                <p style="margin-top: 1rem; font-size: 20px;">Ruta de vuelo</p>
+                <resource-list id="ruta">
+                </resource-list>
+            </div>
+        </div>
+    </div>
+    <div id="info-aerolinea-prop">
+    </div>
+</div>
+
+<style>
+</style>
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module" src="./componentes/base/resource-list/resource-list.js"></script>
+<script type="module">
+    import ControladorVuelos from './controladores/vuelos.js'
+    import ControladorUsuarios from './controladores/usuarios.js'
+    import {getUsuario} from "./utils/index.js"
+
+    try{
+        const params = JSON.parse(localStorage.getItem("params"))
+        const vNombre = params.vuelo;
+        const usuarioLog = getUsuario()
+
+
+        function cargar_esquema(){
+            
+        }
+        //console.log(vuelo)
+        const getVuelo = async ()=>{
+            const v = await ControladorVuelos.consultarVuelo(vNombre)
+            const r = await ControladorVuelos.consultarRuta(v.ruta)
+            const a = await ControladorUsuarios.consultarUsuarios(v.aerolinea)
+            $("#imagen-vuelo").attr("src", "./assets/imagenes-precargadas/"+v.imagen)
+            $("#nombre-vuelo").html(v.nombre)
+            $("#desc-vuelo").html("Fecha de alta: " + v.fechaAlta)
+
+            const aList = [a]
+            $("#aerolinea").attr("items",JSON.stringify(aList.map(a => ({name:a.nombre, key:a.nickname, image:"./assets/imagenes-precargadas/"+a.imagen}))))
+            $("#aerolinea").attr("path","/consultarUsuario")
+            $("#aerolinea").attr("paramkey", "nickname")
+            
+            const rList = [r]
+            $("#ruta").attr("items",JSON.stringify(rList.map(a => ({name:a.nombre, key:a.nombre, image:"./assets/imagenes-precargadas/"+a.imagen}))))
+            $("#ruta").attr("path","/consultaRuta")
+            $("#ruta").attr("paramkey", "ruta")
+
+            $("#info-asientos-turista").html(v.asientosRestTurista + "/" + v.asientosMaxTurista)
+            $("#info-asientos-ejecutivo").html(v.asientosRestEjecutivo + "/" + v.asientosMaxEjecutivo)
+
+            //cargar info extra si el usuario coincide con la aerolinea
+            if(usuarioLog.nickname === a.nickname){
+                console.log("pue... e berdá")
+                const infoReservas = await ControladorVuelos.consultarReservaVuelo(v.nombre)
+                //primero se carga la estructura
+                if (infoReservas && infoReservas.length === 0) {
+                    const estructura = `<div id="reservas">
+                                            <h2>No hay reservas para este vuelo</h2>
+                                        </div>`
+                    $("#info-aerolinea-prop").html(estructura)
+                    return
+                }
+                const estructura = `<div id="reservas" class="info-reservas">
+                                        <h2>Reservas</h2>
+                                        <resource-list id="reservas-lista">
+                                        </resource-list>
+                                    </div>
+                                    <div id="datos-reserva" class="info-reservas">
+                                        <h2>Datos de reserva</h2>
+                                        <div id="datos-reserva-lista">
+                                        </div>
+                                    </div>
+                                    <div id="pasajes" class="info-reservas">
+                                        <h2>Pasajes</h2>
+                                        <div id="nombres-pasajeros"></div>
+                                    </div>` 
+                $("#info-aerolinea-prop").html(estructura)
+                
+                //cargamos los datos específicos del vuelo
+                //cargamos las reservas
+                $("#reservas-lista").attr("items", JSON.stringify(infoReservas.map(r => {
+                    return {name: r.cliente.nickname, key:r.cliente.nickname, image:"./assets/imagenes-precargadas/"+r.cliente.imagen}
+                })))
+                const reservasClientes = infoReservas.map(r => {
+                    document.getElementById("reservas-lista").shadowRoot.getElementById(`resource-${r.cliente.nickname}`).addEventListener('click',()=>{
+                        
+                        //mostrar los datos como los pasajes
+                        $("#datos-reserva-lista").html("")
+                        let datosReserva = `
+                        <div>
+                            <h4 class="info-reserva-unica">Fecha reserva</h4>
+                            <span> ${r.fechaReserva}</span>
+                        </div>
+                        <div>
+                            <h4 class="info-reserva-unica">Tipo Asiento</h4>
+                            <span> ${r.tipoAsiento}</span>
+                        </div>
+                        <div>
+                            <h4 class="info-reserva-unica">Equipaje extra</h4>
+                            <span> ${r.equipajeExtra}</span>
+                        </div>
+                        <div>
+                            <h4 class="info-reserva-unica">Costo</h4>
+                            <span> $${r.costo}</span>
+                        </div>
+                        <div>
+                            <h4 class="info-reserva-unica">Consultar cliente</h4>
+                            <resource-list id="cliente">
+                            </resource-list>
+                        </div>
+                        `
+
+                        let cList = [r.cliente]
+                        
+                        $("#datos-reserva-lista").html(datosReserva)
+                        $("#cliente").attr("items",JSON.stringify(cList.map(c => ({name:c.nickname, key:c.nickname, image:"./assets/imagenes-precargadas/"+c.imagen}))))
+                        $("#cliente").attr("path","/consultarUsuario")
+                        $("#cliente").attr("paramkey", "nickname")
+                        
+
+                        //cargamos los nombres en la reserva
+                        $("#nombres-pasajeros").html("")
+                        let nomList = [r.pasajes]
+                        nomList = nomList[0]
+                        let nombresReserva = ``
+                        nomList.forEach(pasaje => {
+                            nombresReserva += `
+                                <p style="margin: 5px;">${pasaje.nombre} ${pasaje.apellido}</p>
+                            `
+                        });
+                        console.log(nombresReserva)
+                        $("#nombres-pasajeros").html(nombresReserva)
+                    })
+                })
+            }
+        }
+        getVuelo();
+    } catch (e) {
+        console.error(e)
+    }
+
+    
+
+</script>
+
+<style>
+    #root-consulta-vuelo{
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+        display: grid;
+        grid-template-rows: 1fr 4fr;
+    }
+
+    #info-section{
+        width: 100%;
+        align-items: center;
+    }
+    #links-section{
+        padding-right: 3rem;
+        padding-left: 3rem;
+    }
+    .imagen-nombre-desc{
+        display: grid;
+        grid-template-columns: 1fr 2fr 2fr;
+        grid-template-rows: 1fr;
+    }
+    .imagen-nombre-desc img{
+        justify-self: center;
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    .mini-cards-paquete{
+        margin-top: -5rem;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .mini-card{
+        width: 80%;
+        height: 3rem;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        justify-items: center;
+        align-items: center;
+    }
+    .mini-card h4{
+        margin: 0 !important;
+    }
+    .info-asientos-vuelo{
+        grid-row: 1;
+        grid-column: 2;
+        display: flex;
+        margin-top: 30px;
+    }
+    #info-aerolinea-prop{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .info-reservas{
+        padding-left: 2rem;
+    }
+    .info-reserva-unica{
+        margin-bottom: 8px;
+    }
+</style>

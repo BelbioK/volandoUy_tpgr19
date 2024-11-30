@@ -1,0 +1,64 @@
+<div id="root-listar-vuelos">
+
+</div>
+<script type="module" src="./componentes/base/card/card.js"></script>
+<script type="module">
+    import ControladorVuelo from './controladores/vuelos.js'
+    import {navigate} from './utils/index.js'
+    
+    try{
+        const filtros = JSON.parse(localStorage.getItem("filtros"))
+
+        const listarVuelos = async ()=>{
+            let vuelos = await ControladorVuelo.listarVuelos();
+            if(filtros.busqueda) {
+                let busqueda = filtros.busqueda;
+                vuelos = vuelos.filter(v => v.nombre.toLowerCase().includes(busqueda.toLowerCase()));
+            }
+            
+            if(filtros.aerolinea) {
+                let aeroFiltro = filtros.aerolinea;
+                vuelos = vuelos.filter(v => v.aerolinea === aeroFiltro);
+            }
+
+            if(filtros.ruta) {
+                let rutaFiltro = filtros.ruta;
+                vuelos = vuelos.filter(v => v.ruta === rutaFiltro);
+            }
+
+            $('#root-listar-vuelos').html(vuelos.map((v,i) => `<info-card id='card-${i}' data='${JSON.stringify({image:`./assets/imagenes-precargadas/${v.imagen}`,title:v.nombre,subtitle:"Fecha del vuelo: " + v.fecha, content: ""})}'>
+                                                                 <slot slot="additionalInfo" class="row-info">
+                                                                        <span>${v.aerolinea}</span>
+                                                                        <span>${v.ruta}</span>
+                                                                    </slot>
+                                                                </info-card>`).join(''));
+            vuelos.forEach((v,i) => {
+                $(`#card-${i}`).click(()=>{
+                    console.log("v")
+                    navigate("/consultaVuelo",{vuelo:v.nombre})
+            })
+            });
+        }
+        listarVuelos();
+    } catch (e) {
+        console.error(e)
+    }
+</script>
+<style>
+    #root-listar-vuelos{
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+ }
+ .row-categorias{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+    .row-info span{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+    }
+</style>

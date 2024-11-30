@@ -1,0 +1,37 @@
+ #root-listar-vuelos{
+	max-height: calc(100vh - 57px);
+	overflow-y: auto;
+    width: 100%;
+    padding: 1rem;
+ }
+
+    .tipoAsiento{
+        background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+        margin-right: 1rem;
+    }
+    .fecha{
+        background-color: rgb(207, 146, 226);
+    }
+    .ejecutivo{
+        background-color: rgb(226, 146, 213);
+    }
+    .turista{
+        background-color: rgb(146, 194, 226);
+    }
+    .row-info{
+		display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+	}
+	.row-info span{
+       	background-color: var(--purple-primary);
+        border-radius: 10px;
+        color: #f4f4f9;
+        padding: 5px;
+	}

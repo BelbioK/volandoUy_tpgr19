@@ -1,0 +1,122 @@
+<div id="root-consulta-reserva">
+    <div id="seccion-info">
+        <div id="seccion-false-card">
+            <img id="img-vuelo" />
+            <div style="display: flex; flex-direction: column; padding: 1rem; gap: 1rem;">
+                <span id="nombre-vuelo"></span>
+                <span id="nombre-ruta"></span>
+            </div>
+        </div>
+        <div id="seccion-info-general" style="display: grid; grid-template-columns: 1fr 1fr;">
+            <div id="seccion-info-general-datos">
+                <h4 class="info-reserva-unica">Fecha reserva</h4>
+                <span id="fecha-reserva"> ${r.fechaReserva}</span>
+                <h4 class="info-reserva-unica">Tipo asiento</h4>
+                <span id="tipo-asiento"> ${r.fechaReserva}</span>
+                <h4 class="info-reserva-unica">Equipaje extra</h4>
+                <span id="equipaje-extra"> ${r.fechaReserva}</span>
+                <h4 class="info-reserva-unica">Costo</h4>
+                <span id="costo"> ${r.fechaReserva}</span>
+                <h4 class="info-descuento"></h4>
+                <span id="descuento"></span>
+            </div>
+            <div id="seccion-info-general-pasajes" style="display: flex; flex-direction: column; gap: 10px;">
+                <h4 class="info-reserva-unica">Pasajes</h4>
+                
+            </div>
+        </div>
+    </div>
+    <div id="seccion-links">
+        <p style="margin-top: 1rem; font-size: 20px;" id="p-usuario">Usuario</p>
+        <resource-list id="list-usuario">
+        </resource-list>
+        <p style="margin-top: 1rem; font-size: 20px;">Ruta de vuelo</p>
+        <resource-list id="list-ruta">
+        </resource-list>
+        <p style="margin-top: 1rem; font-size: 20px;">Vuelo</p>
+        <resource-list id="list-vuelo">
+        </resource-list>
+        <p style="margin-top: 1rem; font-size: 20px;">Paquete</p>
+        <resource-list id="list-paquete">
+        </resource-list>
+        <span id="no-hay-paquete" style="display: none;">No se usó paquete</span>
+    </div>
+</div>
+
+<script type="module">
+    import ControladorVuelos from './controladores/vuelos.js'
+    import {getUsuario} from './utils/index.js'
+    const params = JSON.parse(localStorage.getItem("params"))
+    const {vuelo,cliente} = params;
+    var reserva = {}
+    const getReserva = async() =>{
+        reserva =await ControladorVuelos.consultarReservaVueloCliente(vuelo,cliente);
+
+        $("#img-vuelo").attr("src","./assets/imagenes-precargadas/"+reserva.vuelo.imagen)
+        $("#nombre-vuelo").html(reserva.vuelo.nombre);
+        $("#nombre-ruta").html(reserva.ruta.nombre);
+
+        $("#fecha-reserva").html(reserva.fechaReserva);
+        $("#tipo-asiento").html(reserva.tipoAsiento);
+        $("#equipaje-extra").html(reserva.equipajeExtra);
+        $("#costo").html(reserva.costo);
+
+
+        reserva.pasajes.forEach(pasaje => {
+            $('#seccion-info-general-pasajes').append(`<span>${pasaje.nombre} ${pasaje.apellido}</span>`)})
+        if(getUsuario().tipo == "cliente"){
+            $("#p-usuario").html("Aerolinea");
+            $("#list-usuario").attr("items",JSON.stringify([{name:reserva.aerolinea.nombre,key:reserva.aerolinea.nickname,image:"./assets/imagenes-precargadas/"+reserva.aerolinea.imagen}]))
+            $("#list-usuario").attr("path","/consultaUsuario")
+            $("#list-usuario").attr("paramkey","nickname")
+        }else{
+            $("#p-usuario").html("Cliente");
+            $("#list-usuario").attr("items",JSON.stringify([{name:reserva.cliente.nombre+" "+reserva.cliente.apellido,key:reserva.cliente.nickname,image:"./assets/imagenes-precargadas/"+reserva.cliente.imagen}]))
+            $("#list-usuario").attr("path","/consultaUsuario")
+            $("#list-usuario").attr("paramkey","nickname")
+        }
+
+        $("#list-ruta").attr("items",JSON.stringify([{name:reserva.ruta.nombre,key:reserva.ruta.nombre,image:"./assets/imagenes-precargadas/"+reserva.ruta.imagen}]))
+        $("#list-ruta").attr("path","/consultaRuta")
+        $("#list-ruta").attr("paramkey","ruta")
+
+        $("#list-vuelo").attr("items",JSON.stringify([{name:reserva.vuelo.nombre,key:reserva.vuelo.nombre,image:"./assets/imagenes-precargadas/"+reserva.vuelo.imagen}]))
+        $("#list-vuelo").attr("path","/consultaVuelo")
+        $("#list-vuelo").attr("paramkey","vuelo")
+
+        if(reserva.paquete){
+            $("#list-paquete").attr("items",JSON.stringify([{name:reserva.paquete.nombre,key:reserva.paquete.nombre,image:"./assets/imagenes-precargadas/"+reserva.paquete.imagen}]))
+            $("#list-paquete").attr("path","/consultaPaquete")
+            $("#list-paquete").attr("paramkey","paquete")
+
+            $("#info-descuento").html("Descuento aplicado");
+            $("#descuento").html(reserva.paquete.descuento+"%");
+        }else{
+            $("#list-paquete").remove();
+            $("#no-hay-paquete").css("display","inline");
+        }
+        // $("#root-consulta-reserva").html(JSON.stringify(reserva))
+    }
+    getReserva();
+</script>
+
+
+<style>
+    #root-consulta-reserva{
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        padding: 2rem;
+    }
+    #no-hay-paquete{
+        color: var(--red-primary);
+    }
+    #seccion-false-card{
+        display: flex;        
+    }
+    #seccion-false-card img{
+        height: 200px;
+        width: 200px;
+        object-fit: cover;
+        border-radius: 1rem;
+    }
+</style>
